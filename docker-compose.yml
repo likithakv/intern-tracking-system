@@ -1,0 +1,33 @@
+services:
+  backend:
+    build: ./backend/BE
+    container_name: intern_tracking_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/BE:/app
+    environment:
+      - MONGO_URI=mongodb://db:27017/intern_tracking_system
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend/FE
+    container_name: intern_tracking_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/FE:/app
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api
+
+  db:
+    image: mongo:latest
+    container_name: intern_tracking_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  mongo_data:

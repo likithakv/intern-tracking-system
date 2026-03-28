@@ -1,0 +1,975 @@
+{
+  "admins": [
+    {
+      "name": "System Admin",
+      "email": "admin@interntrack.com",
+      "password_hash": "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T17:56:10.550030"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9a"
+      }
+    }
+  ],
+  "interns": [
+    {
+      "name": "Aarav Sharma",
+      "email": "aarav.sharma@example.com",
+      "domain": "Frontend Engineering",
+      "mentor": "Ritika Sen",
+      "status": "On Track",
+      "start_date": "2026-02-16",
+      "end_date": "2026-05-17",
+      "last_active": "2026-03-27",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9b"
+      }
+    },
+    {
+      "name": "Meera Iyer",
+      "email": "meera.iyer@example.com",
+      "domain": "Backend Engineering",
+      "mentor": "Arjun Mehta",
+      "status": "Needs Attention",
+      "start_date": "2026-02-01",
+      "end_date": "2026-05-02",
+      "last_active": "2026-03-28",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9c"
+      }
+    },
+    {
+      "name": "Kabir Patel",
+      "email": "kabir.patel@example.com",
+      "domain": "QA Automation",
+      "mentor": "Nisha Verma",
+      "status": "On Track",
+      "start_date": "2026-02-28",
+      "end_date": "2026-05-29",
+      "last_active": "2026-03-26",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9d"
+      }
+    },
+    {
+      "name": "Ananya Roy",
+      "email": "ananya.roy@example.com",
+      "domain": "Data Analytics",
+      "mentor": "Pooja Nair",
+      "status": "Certificate Ready",
+      "start_date": "2026-01-17",
+      "end_date": "2026-03-27",
+      "last_active": "2026-03-28",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9e"
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "title": "Build dashboard shell",
+      "description": "Create responsive layout, navigation, and stat cards.",
+      "assigned_to": "69c8163a3ebd1c048e069c9b",
+      "priority": "High",
+      "status": "Completed",
+      "progress": 100,
+      "start_date": "2026-03-16",
+      "deadline": "2026-03-26",
+      "deliverable": "React dashboard UI",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-16T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069c9f"
+      }
+    },
+    {
+      "title": "Attendance API integration",
+      "description": "Connect attendance widgets with backend endpoint data.",
+      "assigned_to": "69c8163a3ebd1c048e069c9b",
+      "priority": "Medium",
+      "status": "In Progress",
+      "progress": 72,
+      "start_date": "2026-03-23",
+      "deadline": "2026-03-31",
+      "deliverable": "Attendance analytics module",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-23T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca0"
+      }
+    },
+    {
+      "title": "Design MongoDB schema",
+      "description": "Define intern, task, attendance, and certification documents.",
+      "assigned_to": "69c8163a3ebd1c048e069c9c",
+      "priority": "High",
+      "status": "Completed",
+      "progress": 100,
+      "start_date": "2026-03-10",
+      "deadline": "2026-03-20",
+      "deliverable": "Database schema notes",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-10T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca1"
+      }
+    },
+    {
+      "title": "Implement task alerts",
+      "description": "Highlight overdue and pending tasks on the admin dashboard.",
+      "assigned_to": "69c8163a3ebd1c048e069c9c",
+      "priority": "High",
+      "status": "Pending",
+      "progress": 10,
+      "start_date": "2026-03-27",
+      "deadline": "2026-04-01",
+      "deliverable": "Alert logic and UI states",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca2"
+      }
+    },
+    {
+      "title": "Write regression checklist",
+      "description": "Prepare test checklist for attendance and task flows.",
+      "assigned_to": "69c8163a3ebd1c048e069c9d",
+      "priority": "Medium",
+      "status": "In Progress",
+      "progress": 58,
+      "start_date": "2026-03-21",
+      "deadline": "2026-04-03",
+      "deliverable": "QA checklist",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-21T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca3"
+      }
+    },
+    {
+      "title": "Prepare final presentation",
+      "description": "Summarize project outcomes, metrics, and certification notes.",
+      "assigned_to": "69c8163a3ebd1c048e069c9e",
+      "priority": "Low",
+      "status": "Completed",
+      "progress": 100,
+      "start_date": "2026-03-19",
+      "deadline": "2026-03-30",
+      "deliverable": "Presentation deck",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-19T17:56:10.552046"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca4"
+      }
+    }
+  ],
+  "attendance": [
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-15",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-15T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca5"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-16",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-16T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca6"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-17",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-17T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca7"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-18",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-18T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca8"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-19",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-19T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ca9"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-20",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-20T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069caa"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-21",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-21T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cab"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-22",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-22T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cac"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-23",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-23T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cad"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-24",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-24T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cae"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-25",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-25T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069caf"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-26",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-26T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb0"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-27",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb1"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "date": "2026-03-28",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb2"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-15",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-15T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb3"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-16",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-16T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb4"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-17",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-17T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb5"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-18",
+      "status": "Leave",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-18T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb6"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-19",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-19T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb7"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-20",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-20T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb8"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-21",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-21T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cb9"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-22",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-22T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cba"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-23",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-23T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cbb"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-24",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-24T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cbc"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-25",
+      "status": "Leave",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-25T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cbd"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-26",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-26T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cbe"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-27",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cbf"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "date": "2026-03-28",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc0"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-15",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-15T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc1"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-16",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-16T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc2"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-17",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-17T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc3"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-18",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-18T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc4"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-19",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-19T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc5"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-20",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-20T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc6"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-21",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-21T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc7"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-22",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-22T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc8"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-23",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-23T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cc9"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-24",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-24T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cca"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-25",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-25T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ccb"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-26",
+      "status": "Leave",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-26T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ccc"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-27",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ccd"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "date": "2026-03-28",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cce"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-15",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-15T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ccf"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-16",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-16T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd0"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-17",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-17T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd1"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-18",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-18T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd2"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-19",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-19T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd3"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-20",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-20T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd4"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-21",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-21T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd5"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-22",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-22T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd6"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-23",
+      "status": "Leave",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-23T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd7"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-24",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-24T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd8"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-25",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-25T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cd9"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-26",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-26T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cda"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-27",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cdb"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "date": "2026-03-28",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T17:56:10.556079"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cdc"
+      }
+    }
+  ],
+  "activity": [
+    {
+      "kind": "task",
+      "message": "Aarav Sharma completed Build dashboard shell.",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T14:56:10.559851"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cdd"
+      }
+    },
+    {
+      "kind": "attendance",
+      "message": "Meera Iyer recorded absent attendance today.",
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-28T12:56:10.559851"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cde"
+      }
+    },
+    {
+      "kind": "certificate",
+      "message": "Ananya Roy is ready for certification review.",
+      "intern_id": "69c8163a3ebd1c048e069c9e",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T17:56:10.559851"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069cdf"
+      }
+    },
+    {
+      "kind": "task",
+      "message": "Kabir Patel updated Write regression checklist to 58%.",
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T15:56:10.559851"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8163a3ebd1c048e069ce0"
+      }
+    }
+  ]
+}
