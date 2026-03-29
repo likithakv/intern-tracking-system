@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
-from app.api import attendance, auth, interns, reports, tasks
+from app.api import attendance, auth, evaluations, interns, reports, tasks
 from app.db.mongodb import ensure_seed_data
 from app.services.notifications import notification_worker, process_pending_task_notifications
 
@@ -44,6 +44,7 @@ app.include_router(auth.router, prefix="/api")
 app.include_router(interns.router, prefix="/api")
 app.include_router(tasks.router, prefix="/api")
 app.include_router(attendance.router, prefix="/api")
+app.include_router(evaluations.router, prefix="/api")
 app.include_router(reports.router, prefix="/api")
 
 

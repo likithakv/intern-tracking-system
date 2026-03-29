@@ -110,6 +110,15 @@ async def create_task(payload: TaskCreate):
             "created_at": datetime.utcnow(),
         }
     )
+    await db.audit_logs.insert_one(
+        {
+            "entity": "task",
+            "entity_id": payload.assigned_to,
+            "action": "assign",
+            "message": f"Task '{payload.title}' assigned to {intern['name']}.",
+            "created_at": datetime.utcnow(),
+        }
+    )
 
     created = await db.tasks.find_one({"_id": result.inserted_id})
     await notify_task_assignment(intern, created)
@@ -207,6 +216,15 @@ async def intern_update_task(task_id: str, payload: InternTaskUpdate):
             "created_at": datetime.utcnow(),
         }
     )
+    await db.audit_logs.insert_one(
+        {
+            "entity": "task",
+            "entity_id": payload.intern_id,
+            "action": "update",
+            "message": f"Task '{updated['title']}' updated by {intern['name']} to {payload.status}.",
+            "created_at": datetime.utcnow(),
+        }
+    )
 
     notifications, changed = await maybe_notify_for_task(updated, intern)
     if changed:
@@ -241,6 +259,15 @@ async def review_task_submission(task_id: str, payload: TaskSubmissionReview):
         {
             "kind": "task",
             "intern_id": updated["assigned_to"],
+            "message": f"Task proof for '{updated['title']}' was {payload.review_status.lower()} by admin.",
+            "created_at": datetime.utcnow(),
+        }
+    )
+    await db.audit_logs.insert_one(
+        {
+            "entity": "task_proof",
+            "entity_id": updated["assigned_to"],
+            "action": payload.review_status.lower(),
             "message": f"Task proof for '{updated['title']}' was {payload.review_status.lower()} by admin.",
             "created_at": datetime.utcnow(),
         }

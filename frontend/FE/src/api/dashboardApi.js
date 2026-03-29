@@ -72,9 +72,54 @@ export async function markAttendance(payload) {
   }
 }
 
+export async function getAttendance() {
+  try {
+    const response = await axiosInstance.get('/attendance/');
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function getLeaveRequests() {
+  try {
+    const response = await axiosInstance.get('/attendance/leave-requests');
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function createLeaveRequest(payload) {
+  try {
+    const response = await axiosInstance.post('/attendance/leave-requests', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function reviewLeaveRequest(requestId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/attendance/leave-requests/${requestId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
 export async function updateIntern(internId, payload) {
   try {
     const response = await axiosInstance.patch(`/interns/${internId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function archiveIntern(internId) {
+  try {
+    const response = await axiosInstance.patch(`/interns/${internId}/archive`);
     return response.data;
   } catch (error) {
     throw new Error(normalizeError(error));
@@ -169,6 +214,33 @@ export async function downloadDashboardReport() {
 export async function getInternDashboard(internId) {
   try {
     const response = await axiosInstance.get(`/dashboard/intern/${internId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function getEvaluations() {
+  try {
+    const response = await axiosInstance.get('/evaluations/');
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function createEvaluation(payload) {
+  try {
+    const response = await axiosInstance.post('/evaluations/', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function verifyCertificate(certificateId) {
+  try {
+    const response = await axiosInstance.get(`/dashboard/certificates/verify/${certificateId}`);
     return response.data;
   } catch (error) {
     throw new Error(normalizeError(error));

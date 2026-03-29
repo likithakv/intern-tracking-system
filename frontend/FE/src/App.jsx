@@ -26,9 +26,12 @@ import {
 } from 'lucide-react';
 import {
   createIntern,
+  createEvaluation,
+  createLeaveRequest,
   createTask,
   downloadCertificate,
   downloadDashboardReport,
+  archiveIntern,
   getDashboard,
   getInternDashboard,
   getTasks,
@@ -37,6 +40,7 @@ import {
   loginAdmin,
   loginIntern,
   markAttendance,
+  reviewLeaveRequest,
   registerAdmin,
   sendBroadcastMessage,
   sendInternMessage,
@@ -45,6 +49,7 @@ import {
   updateIntern,
   updateTaskFromIntern,
   updateTask,
+  verifyCertificate,
 } from './api/dashboardApi';
 import './App.css';
 
@@ -80,6 +85,7 @@ const emptyTaskForm = {
   deadline: '', status: 'Pending', progress: 0, deliverable: '', project_template: '',
 };
 const emptyAttendanceForm = { intern_id: '', date: '', status: 'Present' };
+const emptyEvaluationForm = { intern_id: '', communication: 8, technical_skill: 8, teamwork: 8, ownership: 8, comments: '', evaluation_date: '' };
 const emptyLoginForm = { email: '', password: '' };
 const emptyRegisterForm = { name: '', email: '', password: '' };
 const emptyAdminProfileForm = {
@@ -116,6 +122,7 @@ const emptyInternTaskUpdateForm = {
   report_file: null,
   screenshot_file: null,
 };
+const emptyLeaveRequestForm = { start_date: '', end_date: '', reason: '' };
 const internSections = [
   { id: 'profile', label: 'My Profile', icon: Users },
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -249,6 +256,7 @@ function AuthScreen({
   accessMode,
   authMode, loginForm, registerForm, onLoginChange, onRegisterChange,
   onLogin, onRegister, setAuthMode, setAccessMode, authLoading, error,
+  certificateLookupId, setCertificateLookupId, onVerifyCertificate, certificateLookupResult,
 }) {
   return (
     <div className="auth-shell">
@@ -299,6 +307,12 @@ function AuthScreen({
               <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Creating...' : 'Create Admin'}</button>
             </form>
           )}
+          <form className="auth-form top-gap" onSubmit={onVerifyCertificate}>
+            <strong>Public certificate verification</strong>
+            <label>Certificate ID<input value={certificateLookupId} onChange={(event) => setCertificateLookupId(event.target.value)} placeholder="ITS-XXXXXXXXXX" required /></label>
+            <button className="secondary-button auth-submit" type="submit">Verify Certificate</button>
+            {certificateLookupResult ? <div className="helper-note compact-note"><span>{certificateLookupResult.valid ? 'Certificate is genuine' : 'Certificate found'}</span><span>{certificateLookupResult.internName} | {certificateLookupResult.domain}</span><span>{certificateLookupResult.issuedForCycle}</span></div> : null}
+          </form>
         </div>
       </div>
     </div>
@@ -334,6 +348,7 @@ function App() {
   const [internForm, setInternForm] = useState(emptyInternForm);
   const [taskForm, setTaskForm] = useState(emptyTaskForm);
   const [attendanceForm, setAttendanceForm] = useState(emptyAttendanceForm);
+  const [evaluationForm, setEvaluationForm] = useState(emptyEvaluationForm);
   const [adminProfileForm, setAdminProfileForm] = useState(emptyAdminProfileForm);
   const [loginForm, setLoginForm] = useState(emptyLoginForm);
   const [registerForm, setRegisterForm] = useState(emptyRegisterForm);
@@ -341,6 +356,7 @@ function App() {
   const [broadcastForm, setBroadcastForm] = useState(emptyBroadcastForm);
   const [internProfileForm, setInternProfileForm] = useState(emptyInternProfileForm);
   const [internTaskUpdateForm, setInternTaskUpdateForm] = useState(emptyInternTaskUpdateForm);
+  const [leaveRequestForm, setLeaveRequestForm] = useState(emptyLeaveRequestForm);
   const [adminSession, setAdminSession] = useState(() => {
     const stored = sessionStorage.getItem(SESSION_KEY);
     if (!stored) return null;
@@ -365,9 +381,13 @@ function App() {
   const [isChangingInternPassword, setIsChangingInternPassword] = useState(false);
   const [isChangingAdminPassword, setIsChangingAdminPassword] = useState(false);
   const [downloadingCertificateId, setDownloadingCertificateId] = useState('');
+  const [certificateLookupId, setCertificateLookupId] = useState('');
+  const [certificateLookupResult, setCertificateLookupResult] = useState(null);
   const [internPasswordForm, setInternPasswordForm] = useState({ current_password: '', new_password: '' });
   const [adminPasswordForm, setAdminPasswordForm] = useState({ current_password: '', new_password: '' });
   const [internTaskFilter, setInternTaskFilter] = useState('all');
+  const [isSubmittingEvaluation, setIsSubmittingEvaluation] = useState(false);
+  const [isSubmittingLeaveRequest, setIsSubmittingLeaveRequest] = useState(false);
   const normalizedQuery = searchQuery.trim().toLowerCase();
 
   const maxTaskValue = useMemo(() => {
@@ -475,6 +495,11 @@ function App() {
       ...current,
       intern_id: current.intern_id || dashboard.interns[0].id,
       date: current.date || new Date().toISOString().slice(0, 10),
+    }));
+    setEvaluationForm((current) => ({
+      ...current,
+      intern_id: current.intern_id || dashboard.interns[0].id,
+      evaluation_date: current.evaluation_date || new Date().toISOString().slice(0, 10),
     }));
   }, [dashboard]);
 
@@ -896,6 +921,46 @@ function App() {
     }
   };
 
+  const handleLeaveRequestSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      setIsSubmittingLeaveRequest(true);
+      setError('');
+      await createLeaveRequest({ intern_id: adminSession.id, ...leaveRequestForm });
+      setLeaveRequestForm(emptyLeaveRequestForm);
+      setSuccessMessage('Leave request sent successfully.');
+      await loadDashboard();
+    } catch (err) {
+      setError(err.message || 'Unable to submit leave request.');
+    } finally {
+      setIsSubmittingLeaveRequest(false);
+    }
+  };
+
+  const handleLeaveRequestReview = async (requestId, status) => {
+    try {
+      setError('');
+      await reviewLeaveRequest(requestId, { status });
+      setSuccessMessage(`Leave request ${status.toLowerCase()}.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(err.message || 'Unable to review leave request.');
+    }
+  };
+
+  const handleCertificateVerification = async (event) => {
+    event.preventDefault();
+    try {
+      setError('');
+      const response = await verifyCertificate(certificateLookupId.trim());
+      setCertificateLookupResult(response);
+      setSuccessMessage(response.valid ? 'Certificate verified successfully.' : 'Certificate found but not currently eligible.');
+    } catch (err) {
+      setCertificateLookupResult(null);
+      setError(err.message || 'Unable to verify certificate.');
+    }
+  };
+
   const handleSendMessage = async (event) => {
     event.preventDefault();
     if (!selectedInternForMessage) return;
@@ -1061,6 +1126,27 @@ function App() {
     }
   };
 
+  const handleEvaluationSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      setIsSubmittingEvaluation(true);
+      setError('');
+      await createEvaluation({
+        ...evaluationForm,
+        communication: Number(evaluationForm.communication),
+        technical_skill: Number(evaluationForm.technical_skill),
+        teamwork: Number(evaluationForm.teamwork),
+        ownership: Number(evaluationForm.ownership),
+      });
+      setSuccessMessage('Evaluation saved successfully.');
+      await loadDashboard();
+    } catch (err) {
+      setError(err.message || 'Unable to save evaluation.');
+    } finally {
+      setIsSubmittingEvaluation(false);
+    }
+  };
+
   const handleTaskStatusUpdate = async (taskId, currentStatus, currentProgress) => {
     const nextStatus = currentStatus === 'Completed' ? 'In Progress' : 'Completed';
     const nextProgress = nextStatus === 'Completed' ? 100 : currentProgress || 65;
@@ -1071,6 +1157,17 @@ function App() {
       await loadDashboard();
     } catch (err) {
       setError(err.message || 'Unable to update task.');
+    }
+  };
+
+  const handleArchiveToggle = async (intern) => {
+    try {
+      setError('');
+      const response = await archiveIntern(intern.id);
+      setSuccessMessage(response.message || 'Intern archive state updated.');
+      await loadDashboard();
+    } catch (err) {
+      setError(err.message || 'Unable to archive intern.');
     }
   };
 
@@ -1281,10 +1378,15 @@ function App() {
                 <div className="chart-labels"><span>Attendance</span><strong>{intern.attendanceRate}%</strong></div>
                 <div className="mini-progress attendance-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${intern.attendanceRate}%` }} transition={{ duration: 0.8 }} /></div>
               </div>
+              <div className="intern-card-progress">
+                <div className="chart-labels"><span>Profile completion</span><strong>{intern.profileCompletion || 0}%</strong></div>
+                <div className="mini-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${intern.profileCompletion || 0}%` }} transition={{ duration: 0.8 }} /></div>
+              </div>
               <div className="table-action-row">
                 <button className="table-action" type="button" onClick={() => openInternDetail(intern)}>View</button>
                 <button className="table-action" type="button" onClick={() => openEditIntern(intern)}><Pencil size={14} />Edit</button>
                 <button className="table-action" type="button" onClick={() => openMessageComposer(intern)}><Mail size={14} />Send Mail</button>
+                <button className="table-action" type="button" onClick={() => handleArchiveToggle(intern)}>{intern.status === 'Archived' ? 'Restore' : 'Archive'}</button>
               </div>
             </motion.article>
           ))}
@@ -1300,13 +1402,14 @@ function App() {
                   <td>{intern.mentor}</td>
                   <td>{intern.attendanceRate}%</td>
                   <td>{intern.completedTasks}/{intern.totalTasks}<span>{(intern.badges || []).join(', ') || 'No badges'}</span></td>
-                  <td><span>{formatDate(intern.startDate)}</span><span>{formatDate(intern.endDate)}</span></td>
+                  <td><span>{formatDate(intern.startDate)}</span><span>{formatDate(intern.endDate)}</span><span>{intern.profileCompletion || 0}% profile</span></td>
                   <td><span className={`status-pill ${intern.status.toLowerCase().replace(/\s+/g, '-')}`}>{intern.status}</span></td>
                   <td>
                     <div className="table-action-row">
                       <button className="table-action" type="button" onClick={() => openInternDetail(intern)}>View</button>
                       <button className="table-action" type="button" onClick={() => openEditIntern(intern)}><Pencil size={14} />Edit</button>
                       <button className="table-action" type="button" onClick={() => openMessageComposer(intern)}><Mail size={14} />Mail</button>
+                      <button className="table-action" type="button" onClick={() => handleArchiveToggle(intern)}>{intern.status === 'Archived' ? 'Restore' : 'Archive'}</button>
                     </div>
                   </td>
                 </tr>
@@ -1425,6 +1528,16 @@ function App() {
           <label>Status<select value={attendanceForm.status} onChange={(event) => setAttendanceForm((current) => ({ ...current, status: event.target.value }))}><option>Present</option><option>Absent</option><option>Leave</option></select></label>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Mark Attendance'}</motion.button>
         </form>
+        <form className="stack-form compact-form top-gap" onSubmit={handleEvaluationSubmit}>
+          <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
+          <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
+          <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
+          <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
+          <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
+          <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
+          <label className="detail-card-wide">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Evaluation'}</motion.button>
+        </form>
         <div className="evaluation-grid">
           {filteredPerformance.map((item) => (
             <motion.div key={item.internId} className="evaluation-card" whileHover={{ y: -5 }}>
@@ -1437,6 +1550,12 @@ function App() {
                 <span>Attendance: {item.attendanceRate}%</span>
                 <span>Tasks: {item.taskCompletionRate}%</span>
               </div>
+              {dashboard.evaluations.find((entry) => entry.intern_id === item.internId) ? (
+                <div className="helper-note compact-note">
+                  <span>Evaluation: {dashboard.evaluations.find((entry) => entry.intern_id === item.internId).overall_score}/100</span>
+                  <span>{dashboard.evaluations.find((entry) => entry.intern_id === item.internId).comments}</span>
+                </div>
+              ) : null}
               <div className="mini-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${item.score}%` }} transition={{ duration: 0.8 }} /></div>
             </motion.div>
           ))}
@@ -1469,6 +1588,17 @@ function App() {
             </div>
           ))}
         </div>
+        <div className="mail-audit-card top-gap">
+          <h3>Leave Requests</h3>
+          {dashboard.leaveRequests?.length ? dashboard.leaveRequests.map((request) => (
+            <div key={request.id} className="mail-audit-item">
+              <strong>{request.internName}</strong>
+              <span>{formatDate(request.start_date)} to {formatDate(request.end_date)} | {request.reason}</span>
+              <span>Status: {request.status}</span>
+              {request.status === 'Pending' ? <div className="table-action-row"><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Approved')}>Approve</button><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Rejected')}>Reject</button></div> : null}
+            </div>
+          )) : <p className="muted-copy">No leave requests yet.</p>}
+        </div>
       </motion.article>
     </section>
   );
@@ -1500,7 +1630,7 @@ function App() {
               <div className="certificate-dashboard-top">
                 <div>
                   <strong>{item.name}</strong>
-                  <span>{item.completedTasks}/{item.totalTasks} tasks completed • {item.attendanceRate}% attendance</span>
+                  <span>{item.completedTasks}/{item.totalTasks} tasks completed • {item.attendanceRate}% attendance • {item.certificateId}</span>
                 </div>
                 <span className={`certificate-status ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>{item.status}</span>
               </div>
@@ -1556,6 +1686,21 @@ function App() {
             </div>
           ))}
         </div>
+      </motion.article>
+      <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="panel-header"><div><p className="panel-kicker">Certificate Verification</p><h2>Verify any certificate using its unique ID</h2></div><ShieldCheck size={20} /></div>
+        <form className="stack-form compact-form" onSubmit={handleCertificateVerification}>
+          <label>Certificate ID<input value={certificateLookupId} onChange={(event) => setCertificateLookupId(event.target.value)} placeholder="ITS-XXXXXXXXXX" required /></label>
+          <button type="submit" className="primary-button">Verify Certificate</button>
+        </form>
+        {certificateLookupResult ? (
+          <div className="helper-note top-gap">
+            <strong>{certificateLookupResult.valid ? 'Valid certificate' : 'Certificate found'}</strong>
+            <span>{certificateLookupResult.internName} | {certificateLookupResult.domain}</span>
+            <span>Mentor: {certificateLookupResult.mentor}</span>
+            <span>Cycle: {certificateLookupResult.issuedForCycle}</span>
+          </div>
+        ) : null}
       </motion.article>
     </section>
   );
@@ -1632,10 +1777,12 @@ function App() {
                   <div className="detail-card"><strong>Phone</strong><span>{internDashboard.profile.phone || 'Not set'}</span></div>
                   <div className="detail-card"><strong>College</strong><span>{internDashboard.profile.college || 'Not set'}</span></div>
                   <div className="detail-card"><strong>Batch</strong><span>{internDashboard.profile.batch}</span></div>
+                  <div className="detail-card"><strong>Profile completion</strong><span>{internDashboard.profile.profileCompletion || 0}%</span></div>
                   <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{internDashboard.profile.skills.join(', ') || 'No skills added yet'}</span></div>
                   <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{internDashboard.profile.badges?.join(', ') || 'No badges earned yet'}</span></div>
                   <div className="detail-card detail-card-wide"><strong>Documents</strong><span>{getDocumentEntries(internDashboard.profile.documentRecords).map((item) => item.label).join(', ') || 'No documents uploaded yet'}</span></div>
                 </div>
+                <div className="mini-progress top-gap"><motion.span initial={{ width: 0 }} animate={{ width: `${internDashboard.profile.profileCompletion || 0}%` }} transition={{ duration: 0.8 }} /></div>
               </motion.article>
               <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="panel-header"><div><p className="panel-kicker">Performance</p><h2>Your current standing</h2></div><Award size={20} /></div>
@@ -1653,6 +1800,13 @@ function App() {
                 <div className="badge-pill-row top-gap">
                   {(internDashboard.badgeSummary?.earned || []).length ? internDashboard.badgeSummary.earned.map((badge) => <span key={badge} className="settings-chip">{badge}</span>) : <span className="muted-copy">Keep building consistency to unlock earned badges.</span>}
                 </div>
+                {internDashboard.performance.latestEvaluation ? (
+                  <div className="helper-note top-gap">
+                    Latest evaluation: <strong>{internDashboard.performance.latestEvaluation.overall_score}/100</strong>
+                    <span>Communication {internDashboard.performance.latestEvaluation.communication}/10 | Technical {internDashboard.performance.latestEvaluation.technical_skill}/10 | Teamwork {internDashboard.performance.latestEvaluation.teamwork}/10 | Ownership {internDashboard.performance.latestEvaluation.ownership}/10</span>
+                    <span>{internDashboard.performance.latestEvaluation.comments}</span>
+                  </div>
+                ) : null}
               </motion.article>
               <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="panel-header"><div><p className="panel-kicker">Recent Activity</p><h2>Latest updates for you</h2></div><CalendarRange size={20} /></div>
@@ -1717,6 +1871,7 @@ function App() {
                 <div className="detail-card"><strong>Phone</strong><span>{internDashboard.profile.phone || 'Not set'}</span></div>
                 <div className="detail-card"><strong>College</strong><span>{internDashboard.profile.college || 'Not set'}</span></div>
                 <div className="detail-card"><strong>Batch</strong><span>{internDashboard.profile.batch}</span></div>
+                <div className="detail-card"><strong>Profile completion</strong><span>{internDashboard.profile.profileCompletion || 0}%</span></div>
                 <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{internDashboard.profile.skills.join(', ') || 'No skills added yet'}</span></div>
                 <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{internDashboard.profile.badges?.join(', ') || 'No badges earned yet'}</span></div>
                 <div className="detail-card detail-card-wide"><strong>Documents</strong><span>{getDocumentEntries(internDashboard.profile.documentRecords).map((item) => item.label).join(', ') || 'No documents uploaded yet'}</span></div>
@@ -1747,7 +1902,33 @@ function App() {
                   </div>
                   ))}
                 </div>
+                <div className="document-grid top-gap">
+                  {internDashboard.attendance.records.slice(0, 14).map((record) => (
+                    <div key={`calendar-${record.id}`} className="document-tile">
+                      <strong>{formatDate(record.date)}</strong>
+                      <span>{record.status}</span>
+                    </div>
+                  ))}
+                </div>
               </motion.article>
+            <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="panel-header"><div><p className="panel-kicker">Leave Request</p><h2>Request time away and track approvals</h2></div><CalendarClock size={20} /></div>
+              <form className="stack-form compact-form" onSubmit={handleLeaveRequestSubmit}>
+                <label>Start date<input type="date" value={leaveRequestForm.start_date} onChange={(event) => setLeaveRequestForm((current) => ({ ...current, start_date: event.target.value }))} required /></label>
+                <label>End date<input type="date" value={leaveRequestForm.end_date} onChange={(event) => setLeaveRequestForm((current) => ({ ...current, end_date: event.target.value }))} required /></label>
+                <label className="detail-card-wide">Reason<textarea value={leaveRequestForm.reason} onChange={(event) => setLeaveRequestForm((current) => ({ ...current, reason: event.target.value }))} required /></label>
+                <button type="submit" className="primary-button" disabled={isSubmittingLeaveRequest}>{isSubmittingLeaveRequest ? 'Sending...' : 'Request Leave'}</button>
+              </form>
+              <div className="mail-audit-card top-gap">
+                {internDashboard.leaveRequests?.length ? internDashboard.leaveRequests.map((item) => (
+                  <div key={item.id} className="mail-audit-item">
+                    <strong>{formatDate(item.start_date)} to {formatDate(item.end_date)}</strong>
+                    <span>{item.reason}</span>
+                    <span>Status: {item.status}</span>
+                  </div>
+                )) : <p className="muted-copy">No leave requests yet.</p>}
+              </div>
+            </motion.article>
           </section>
         ) : null}
         {internSection === 'certificates' ? (
@@ -1776,7 +1957,7 @@ function App() {
                   <div className="certificate-dashboard-top">
                     <div>
                       <strong>{internDashboard.profile.name}</strong>
-                      <span>{internDashboard.profile.domain} | {internDashboard.profile.mentor}</span>
+                      <span>{internDashboard.profile.domain} | {internDashboard.profile.mentor} | ID {internDashboard.certificate.certificateId}</span>
                     </div>
                     <span className={`certificate-status ${internDashboard.certificate.status.toLowerCase().replace(/\s+/g, '-')}`}>{internDashboard.certificate.status}</span>
                   </div>
@@ -1972,6 +2153,18 @@ function App() {
                 <button type="button" className="secondary-button" onClick={handleReportDownload}><Download size={16} />{isDownloadingReport ? 'Preparing...' : 'Export CSV'}</button>
               </div>
             </motion.article>
+            <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+              <div className="panel-header"><div><p className="panel-kicker">Audit Log</p><h2>Recent system activity history</h2></div><ClipboardList size={20} /></div>
+              <div className="mail-audit-card">
+                {dashboard.auditLogs?.length ? dashboard.auditLogs.map((item) => (
+                  <div key={item.id} className="mail-audit-item">
+                    <strong>{item.entity} - {item.action}</strong>
+                    <span>{item.message}</span>
+                    <span>{relativeTime(item.timestamp)}</span>
+                  </div>
+                )) : <p className="muted-copy">No audit entries yet.</p>}
+              </div>
+            </motion.article>
           </section>
         );
       default: return renderOverview();
@@ -1993,6 +2186,10 @@ function App() {
         setAccessMode={setAccessMode}
         authLoading={authLoading}
         error={error}
+        certificateLookupId={certificateLookupId}
+        setCertificateLookupId={setCertificateLookupId}
+        onVerifyCertificate={handleCertificateVerification}
+        certificateLookupResult={certificateLookupResult}
       />
     );
   }

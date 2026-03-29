@@ -85,6 +85,42 @@ async def list_interns():
     return [serialize_intern(intern) for intern in interns]
 
 
+@router.patch("/{intern_id}/archive")
+async def archive_intern(intern_id: str):
+    if not ObjectId.is_valid(intern_id):
+        raise HTTPException(status_code=400, detail="Invalid intern id.")
+
+    intern = await db.interns.find_one({"_id": ObjectId(intern_id)})
+    if not intern:
+        raise HTTPException(status_code=404, detail="Intern not found.")
+
+    next_archived = not bool(intern.get("archived"))
+    next_status = "Archived" if next_archived else "On Track"
+    await db.interns.update_one(
+        {"_id": ObjectId(intern_id)},
+        {"$set": {"archived": next_archived, "status": next_status}},
+    )
+    await db.activity.insert_one(
+        {
+            "kind": "intern",
+            "intern_id": intern_id,
+            "message": f"{intern['name']} was {'archived' if next_archived else 'restored'} by admin.",
+            "created_at": datetime.utcnow(),
+        }
+    )
+    await db.audit_logs.insert_one(
+        {
+            "entity": "intern",
+            "entity_id": intern_id,
+            "action": "archive" if next_archived else "restore",
+            "message": f"Intern record for {intern['name']} was {'archived' if next_archived else 'restored'}.",
+            "created_at": datetime.utcnow(),
+        }
+    )
+    updated = await db.interns.find_one({"_id": ObjectId(intern_id)})
+    return {"message": f"Intern {'archived' if next_archived else 'restored'} successfully.", "intern": serialize_intern(updated)}
+
+
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_intern(payload: InternCreate):
     existing = await db.interns.find_one({"email": payload.email.lower()})

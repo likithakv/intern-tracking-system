@@ -103,12 +103,24 @@ def _normalize_document_records(intern):
     return records
 
 
-def _serialize_intern_portal(intern, tasks, attendance_records, activity, today):
+def _profile_completion(intern):
+    checks = [
+        bool(intern.get("profile_photo")),
+        bool(intern.get("phone")),
+        bool(intern.get("college")),
+        bool(intern.get("skills")),
+        bool(_normalize_document_records(intern)),
+    ]
+    return round((sum(1 for item in checks if item) / len(checks)) * 100)
+
+
+def _serialize_intern_portal(intern, tasks, attendance_records, activity, evaluations, leave_requests, today):
     completed_tasks = sum(1 for task in tasks if task["status"] == "Completed")
     attendance_rate = _attendance_rate(attendance_records)
     performance_score, task_completion_rate = _performance_score(attendance_rate, completed_tasks, len(tasks))
     certificate_ready = _certificate_ready(intern, tasks, attendance_rate, today)
     earned_badges = _earned_badges(attendance_rate, performance_score, task_completion_rate, len(tasks))
+    latest_evaluation = evaluations[0] if evaluations else None
 
     return {
         "profile": {
@@ -122,11 +134,13 @@ def _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
             "skills": intern.get("skills", []),
             "badges": earned_badges,
             "documentRecords": _normalize_document_records(intern),
+            "profileCompletion": _profile_completion(intern),
             "mentor": intern.get("mentor", ""),
             "batch": intern.get("batch", "Current Cycle"),
             "status": "Certificate Ready" if certificate_ready else intern.get("status", "On Track"),
             "startDate": intern["start_date"],
             "endDate": intern["end_date"],
+            "certificateId": intern.get("certificate_id", ""),
         },
         "stats": [
             {"label": "Attendance", "value": attendance_rate, "suffix": "%"},
@@ -164,6 +178,14 @@ def _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
             "score": performance_score,
             "band": _performance_band(performance_score),
             "taskCompletionRate": task_completion_rate,
+            "latestEvaluation": {
+                "communication": latest_evaluation["communication"],
+                "technical_skill": latest_evaluation["technical_skill"],
+                "teamwork": latest_evaluation["teamwork"],
+                "ownership": latest_evaluation["ownership"],
+                "comments": latest_evaluation["comments"],
+                "overall_score": round(((latest_evaluation["communication"] + latest_evaluation["technical_skill"] + latest_evaluation["teamwork"] + latest_evaluation["ownership"]) / 40) * 100),
+            } if latest_evaluation else None,
         },
         "badgeSummary": {
             "earned": earned_badges,
@@ -192,12 +214,23 @@ def _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
             "status": "Ready" if certificate_ready else "In Review",
             "canDownload": certificate_ready,
             "downloadUrl": f"/api/dashboard/certificates/{str(intern['_id'])}/download" if certificate_ready else None,
+            "certificateId": intern.get("certificate_id", ""),
             "criteria": [
                 {"label": "Attendance at least 85%", "met": attendance_rate >= 85},
                 {"label": "All tasks completed", "met": bool(tasks) and completed_tasks == len(tasks)},
                 {"label": "Final project submitted", "met": bool(tasks) and completed_tasks == len(tasks)},
             ],
         },
+        "leaveRequests": [
+            {
+                "id": str(item["_id"]),
+                "start_date": item["start_date"],
+                "end_date": item["end_date"],
+                "reason": item["reason"],
+                "status": item["status"],
+            }
+            for item in leave_requests
+        ],
     }
 
 
@@ -309,12 +342,22 @@ async def get_dashboard():
     tasks = await db.tasks.find().sort("deadline", 1).to_list(length=400)
     attendance = await db.attendance.find().sort("date", 1).to_list(length=800)
     activity = await db.activity.find().sort("created_at", -1).to_list(length=12)
+    evaluations = await db.evaluations.find().sort("evaluation_date", -1).to_list(length=400)
+    leave_requests = await db.leave_requests.find().sort("start_date", -1).to_list(length=200)
+    audit_logs = await db.audit_logs.find().sort("created_at", -1).to_list(length=200)
+    interns = [intern for intern in interns if not intern.get("archived")]
+    active_intern_ids = {str(intern["_id"]) for intern in interns}
+    tasks = [task for task in tasks if task["assigned_to"] in active_intern_ids]
+    attendance = [record for record in attendance if record["intern_id"] in active_intern_ids]
+    evaluations = [item for item in evaluations if item["intern_id"] in active_intern_ids]
+    leave_requests = [item for item in leave_requests if item["intern_id"] in active_intern_ids]
 
     attendance_by_intern = defaultdict(list)
     for record in attendance:
         attendance_by_intern[record["intern_id"]].append(record)
 
     tasks_by_intern = defaultdict(list)
+    evaluations_by_intern = defaultdict(list)
     status_counts = Counter()
     pending_task_alerts = []
     overdue_count = 0
@@ -327,6 +370,9 @@ async def get_dashboard():
             pending_task_alerts.append(task)
         if task["deadline"] < today and task["status"] != "Completed":
             overdue_count += 1
+
+    for evaluation in evaluations:
+        evaluations_by_intern[evaluation["intern_id"]].append(evaluation)
 
     intern_rows = []
     certifications = []
@@ -342,6 +388,7 @@ async def get_dashboard():
         certificate_ready = _certificate_ready(intern, intern_tasks, attendance_rate, today)
         performance_score, task_completion_rate = _performance_score(attendance_rate, completed_tasks, len(intern_tasks))
         earned_badges = _earned_badges(attendance_rate, performance_score, task_completion_rate, len(intern_tasks))
+        latest_evaluation = evaluations_by_intern[intern_id][0] if evaluations_by_intern[intern_id] else None
         for badge in earned_badges:
             badge_totals[badge] += 1
 
@@ -366,12 +413,22 @@ async def get_dashboard():
                 "attendanceRate": attendance_rate,
                 "completedTasks": completed_tasks,
                 "totalTasks": len(intern_tasks),
+                "profileCompletion": _profile_completion(intern),
+                "certificateId": intern.get("certificate_id", ""),
                 "lastActive": intern.get("last_active", today),
                 "startDate": intern["start_date"],
                 "endDate": intern["end_date"],
                 "performanceScore": performance_score,
                 "taskCompletionRate": task_completion_rate,
                 "earnedBadges": earned_badges,
+                "latestEvaluation": {
+                    "communication": latest_evaluation["communication"],
+                    "technical_skill": latest_evaluation["technical_skill"],
+                    "teamwork": latest_evaluation["teamwork"],
+                    "ownership": latest_evaluation["ownership"],
+                    "comments": latest_evaluation["comments"],
+                    "overall_score": round(((latest_evaluation["communication"] + latest_evaluation["technical_skill"] + latest_evaluation["teamwork"] + latest_evaluation["ownership"]) / 40) * 100),
+                } if latest_evaluation else None,
             }
         )
 
@@ -396,6 +453,7 @@ async def get_dashboard():
                 "status": "Ready" if certificate_ready else "In Review",
                 "canDownload": certificate_ready,
                 "downloadUrl": f"/api/dashboard/certificates/{intern_id}/download" if certificate_ready else None,
+                "certificateId": intern.get("certificate_id", ""),
                 "earnedBadges": earned_badges,
                 "criteria": [
                     {"label": "Attendance at least 85%", "met": attendance_rate >= 85},
@@ -582,6 +640,43 @@ async def get_dashboard():
         "mentorAnalytics": mentor_analytics,
         "deadlineTimeline": timeline,
         "calendarEvents": sorted(calendar_events, key=lambda item: item["date"])[:12],
+        "leaveRequests": [
+            {
+                "id": str(item["_id"]),
+                "intern_id": item["intern_id"],
+                "internName": next((intern["name"] for intern in intern_rows if intern["id"] == item["intern_id"]), "Intern"),
+                "start_date": item["start_date"],
+                "end_date": item["end_date"],
+                "reason": item["reason"],
+                "status": item["status"],
+            }
+            for item in leave_requests
+        ],
+        "evaluations": [
+            {
+                "id": str(item["_id"]),
+                "intern_id": item["intern_id"],
+                "internName": next((intern["name"] for intern in intern_rows if intern["id"] == item["intern_id"]), "Intern"),
+                "communication": item["communication"],
+                "technical_skill": item["technical_skill"],
+                "teamwork": item["teamwork"],
+                "ownership": item["ownership"],
+                "comments": item["comments"],
+                "evaluation_date": item["evaluation_date"],
+                "overall_score": round(((item["communication"] + item["technical_skill"] + item["teamwork"] + item["ownership"]) / 40) * 100),
+            }
+            for item in evaluations[:20]
+        ],
+        "auditLogs": [
+            {
+                "id": str(item["_id"]),
+                "entity": item.get("entity", "system"),
+                "action": item.get("action", "update"),
+                "message": item["message"],
+                "timestamp": item["created_at"].isoformat() if hasattr(item["created_at"], "isoformat") else item["created_at"],
+            }
+            for item in audit_logs[:25]
+        ],
         "batchOptions": list(batch_counter.keys()),
         "quickActions": [
             {"id": "add-intern", "label": "Add Intern", "section": "interns"},
@@ -618,6 +713,34 @@ async def download_certificate(intern_id: str):
         media_type="text/html",
         headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
+
+
+@router.get("/certificates/verify/{certificate_id}")
+async def verify_certificate(certificate_id: str):
+    interns = await db.interns.find().to_list(length=500)
+    tasks = await db.tasks.find().to_list(length=500)
+    attendance = await db.attendance.find().to_list(length=1000)
+    intern = next((item for item in interns if item.get("certificate_id") == certificate_id), None)
+    if not intern:
+        raise HTTPException(status_code=404, detail="Certificate not found.")
+
+    intern_id = str(intern["_id"])
+    intern_tasks = [task for task in tasks if task["assigned_to"] == intern_id]
+    attendance_records = [record for record in attendance if record["intern_id"] == intern_id]
+    attendance_rate = _attendance_rate(attendance_records)
+    completed_tasks = sum(1 for task in intern_tasks if task["status"] == "Completed")
+    valid = _certificate_ready(intern, intern_tasks, attendance_rate, date.today().isoformat())
+    return {
+        "valid": valid,
+        "certificateId": certificate_id,
+        "internName": intern["name"],
+        "domain": intern.get("domain", ""),
+        "mentor": intern.get("mentor", ""),
+        "attendanceRate": attendance_rate,
+        "completedTasks": completed_tasks,
+        "totalTasks": len(intern_tasks),
+        "issuedForCycle": f"{intern.get('start_date')} to {intern.get('end_date')}",
+    }
 
 
 @router.post("/test-email")
@@ -695,5 +818,7 @@ async def get_intern_dashboard(intern_id: str):
     tasks = await db.tasks.find({"assigned_to": intern_id}).to_list(length=200)
     attendance_records = await db.attendance.find({"intern_id": intern_id}).to_list(length=400)
     activity = await db.activity.find({"intern_id": intern_id}).sort("created_at", -1).to_list(length=10)
+    evaluations = await db.evaluations.find({"intern_id": intern_id}).sort("evaluation_date", -1).to_list(length=20)
+    leave_requests = await db.leave_requests.find({"intern_id": intern_id}).sort("start_date", -1).to_list(length=20)
     today = date.today().isoformat()
-    return _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
+    return _serialize_intern_portal(intern, tasks, attendance_records, activity, evaluations, leave_requests, today)

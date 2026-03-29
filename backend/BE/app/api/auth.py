@@ -138,6 +138,8 @@ async def login_intern(payload: InternLogin):
     intern = await db.interns.find_one({"email": payload.email.lower()})
     if not intern or hash_password(payload.password) != intern.get("portal_password_hash", ""):
         raise HTTPException(status_code=401, detail="Invalid email or password.")
+    if intern.get("archived"):
+        raise HTTPException(status_code=403, detail="This intern account has been archived. Contact the administrator.")
 
     await db.interns.update_one(
         {"_id": intern["_id"]},

@@ -1,6 +1,7 @@
 import os
 import hashlib
 import json
+import uuid
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
@@ -55,7 +56,7 @@ class InMemoryCursor:
 
 
 class PersistentStore:
-    collection_names = ("admins", "interns", "tasks", "attendance", "activity")
+    collection_names = ("admins", "interns", "tasks", "attendance", "activity", "evaluations", "leave_requests", "audit_logs")
 
     def __init__(self, file_path):
         self.file_path = Path(file_path)
@@ -180,6 +181,9 @@ class InMemoryDatabase:
         self.tasks = InMemoryCollection(self.store, "tasks")
         self.attendance = InMemoryCollection(self.store, "attendance")
         self.activity = InMemoryCollection(self.store, "activity")
+        self.evaluations = InMemoryCollection(self.store, "evaluations")
+        self.leave_requests = InMemoryCollection(self.store, "leave_requests")
+        self.audit_logs = InMemoryCollection(self.store, "audit_logs")
 
 
 class DatabaseProxy:
@@ -216,6 +220,8 @@ def _seed_interns():
             "documents": ["Resume", "Offer Letter", "ID Proof"],
             "notes": "Strong UI sense. Ready for more ownership on dashboard polish.",
             "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
+            "archived": False,
+            "certificate_id": f"ITS-{uuid.uuid4().hex[:10].upper()}",
             "start_date": (today - timedelta(days=40)).isoformat(),
             "end_date": (today + timedelta(days=50)).isoformat(),
             "last_active": (today - timedelta(days=1)).isoformat(),
@@ -234,6 +240,8 @@ def _seed_interns():
             "documents": ["Resume", "NDA"],
             "notes": "Needs closer deadline tracking. Backend work quality is good.",
             "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
+            "archived": False,
+            "certificate_id": f"ITS-{uuid.uuid4().hex[:10].upper()}",
             "start_date": (today - timedelta(days=55)).isoformat(),
             "end_date": (today + timedelta(days=35)).isoformat(),
             "last_active": today.isoformat(),
@@ -252,6 +260,8 @@ def _seed_interns():
             "documents": ["Resume", "Offer Letter"],
             "notes": "Reliable on documentation and test coverage.",
             "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
+            "archived": False,
+            "certificate_id": f"ITS-{uuid.uuid4().hex[:10].upper()}",
             "start_date": (today - timedelta(days=28)).isoformat(),
             "end_date": (today + timedelta(days=62)).isoformat(),
             "last_active": (today - timedelta(days=2)).isoformat(),
@@ -270,6 +280,8 @@ def _seed_interns():
             "documents": ["Resume", "Completion Review"],
             "notes": "Consistent performer. Good candidate for final recognition.",
             "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
+            "archived": False,
+            "certificate_id": f"ITS-{uuid.uuid4().hex[:10].upper()}",
             "start_date": (today - timedelta(days=70)).isoformat(),
             "end_date": (today - timedelta(days=1)).isoformat(),
             "last_active": today.isoformat(),
@@ -430,6 +442,32 @@ def _seed_admin():
     }
 
 
+def _seed_evaluations(intern_ids):
+    today = date.today()
+    return [
+        {
+            "intern_id": intern_ids[0],
+            "communication": 8,
+            "technical_skill": 9,
+            "teamwork": 8,
+            "ownership": 8,
+            "comments": "Strong progress and clear communication.",
+            "created_at": datetime.utcnow() - timedelta(days=4),
+            "evaluation_date": (today - timedelta(days=4)).isoformat(),
+        },
+        {
+            "intern_id": intern_ids[2],
+            "communication": 7,
+            "technical_skill": 7,
+            "teamwork": 8,
+            "ownership": 7,
+            "comments": "Reliable delivery, should share blockers earlier.",
+            "created_at": datetime.utcnow() - timedelta(days=2),
+            "evaluation_date": (today - timedelta(days=2)).isoformat(),
+        },
+    ]
+
+
 async def ensure_seed_data():
     try:
         await client.admin.command("ping")
@@ -439,7 +477,11 @@ async def ensure_seed_data():
     await db.interns.create_index([("email", ASCENDING)], unique=True)
     await db.admins.create_index([("email", ASCENDING)], unique=True)
     await db.tasks.create_index([("assigned_to", ASCENDING)])
+    await db.tasks.create_index([("deadline", ASCENDING)])
     await db.attendance.create_index([("intern_id", ASCENDING), ("date", ASCENDING)], unique=True)
+    await db.evaluations.create_index([("intern_id", ASCENDING)])
+    await db.leave_requests.create_index([("intern_id", ASCENDING), ("start_date", ASCENDING)])
+    await db.audit_logs.create_index([("created_at", ASCENDING)])
 
     demo_admin = await db.admins.find_one({"email": DEMO_ADMIN_EMAIL})
     if not demo_admin:
@@ -462,16 +504,22 @@ async def ensure_seed_data():
     if await db.interns.count_documents({}) > 0:
         existing_interns = await db.interns.find().to_list(length=500)
         for intern in existing_interns:
-            password_hash = None
+            update_fields = {}
             if intern.get("email", "").lower() == CHANDAN_EMAIL:
-                password_hash = hash_password(CHANDAN_PASSWORD)
+                update_fields["portal_password_hash"] = hash_password(CHANDAN_PASSWORD)
             elif not intern.get("portal_password_hash"):
-                password_hash = hash_password(DEFAULT_INTERN_PASSWORD)
-            if password_hash:
+                update_fields["portal_password_hash"] = hash_password(DEFAULT_INTERN_PASSWORD)
+            if "archived" not in intern:
+                update_fields["archived"] = False
+            if not intern.get("certificate_id"):
+                update_fields["certificate_id"] = f"ITS-{uuid.uuid4().hex[:10].upper()}"
+            if update_fields:
                 await db.interns.update_one(
                     {"_id": intern["_id"]},
-                    {"$set": {"portal_password_hash": password_hash}},
+                    {"$set": update_fields},
                 )
+        if await db.evaluations.count_documents({}) == 0 and existing_interns:
+            await db.evaluations.insert_many(_seed_evaluations([str(item["_id"]) for item in existing_interns[:4]]))
         return
 
     intern_docs = _seed_interns()
@@ -481,3 +529,4 @@ async def ensure_seed_data():
     await db.tasks.insert_many(_seed_tasks(intern_ids))
     await db.attendance.insert_many(_seed_attendance(intern_ids))
     await db.activity.insert_many(_seed_activity(intern_ids))
+    await db.evaluations.insert_many(_seed_evaluations(intern_ids))
