@@ -1513,7 +1513,7 @@ function App() {
                   Your current band <strong>{internDashboard.performance.band}</strong> means {internDashboard.performance.band === 'Watch' ? 'you are progressing but need stronger consistency to move into Strong.' : 'your current progress level in this cycle.'}
                 </div>
                 <div className="badge-pill-row top-gap">
-                  {(internDashboard.badgeRecommendations || []).length ? internDashboard.badgeRecommendations.map((badge) => <span key={badge} className="settings-chip">{badge}</span>) : <span className="muted-copy">Keep building consistency to unlock recommended badges.</span>}
+                  {(internDashboard.badgeSummary?.earned || []).length ? internDashboard.badgeSummary.earned.map((badge) => <span key={badge} className="settings-chip">{badge}</span>) : <span className="muted-copy">Keep building consistency to unlock earned badges.</span>}
                 </div>
               </motion.article>
               <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
@@ -2089,7 +2089,7 @@ function App() {
               <div className="detail-card"><strong>Batch</strong><span>{selectedInternDetail.batch || 'Current Cycle'}</span></div>
               <div className="detail-card"><strong>Emergency Contact</strong><span>{selectedInternDetail.emergency_contact || 'Not set'}</span></div>
               <div className="detail-card"><strong>Documents</strong><span>{selectedInternDetail.documents?.join(', ') || 'No documents added'}</span></div>
-              <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{selectedInternDetail.badges?.join(', ') || 'No badges assigned'}</span></div>
+              <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{selectedInternDetail.earnedBadges?.join(', ') || selectedInternDetail.badges?.join(', ') || 'No badges earned yet'}</span></div>
               <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{selectedInternDetail.skills?.join(', ') || 'No skills added'}</span></div>
               <div className="detail-card detail-card-wide"><strong>Admin Notes</strong><span>{selectedInternDetail.notes || 'No notes yet'}</span></div>
             </div>
