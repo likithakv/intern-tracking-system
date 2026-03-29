@@ -18,6 +18,8 @@ pnpm-lock.yaml
 .pytest_cache/
 frontend/FE/dist-verify/
 frontend/FE/dist-verify-2/
+frontend/FE/dist-verify-*/
+backend/BE/data/email_outbox.json
 frontend/public/src/
 *_new.py
 *_new.js

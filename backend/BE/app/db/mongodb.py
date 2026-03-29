@@ -17,6 +17,9 @@ MONGO_URI = (
 DEMO_ADMIN_EMAIL = "admin@interntrack.com"
 DEMO_ADMIN_PASSWORD = "admin123"
 DEMO_ADMIN_NAME = "System Admin"
+DEFAULT_INTERN_PASSWORD = "intern123"
+CHANDAN_EMAIL = "chandanchandukv2005@gmail.com"
+CHANDAN_PASSWORD = "chandan123"
 FALLBACK_DB_PATH = Path(__file__).resolve().parents[2] / "data" / "fallback_db.json"
 
 def hash_password(password: str) -> str:
@@ -202,9 +205,17 @@ def _seed_interns():
         {
             "name": "Aarav Sharma",
             "email": "aarav.sharma@example.com",
+            "phone": "+91 9876543210",
+            "college": "National Institute of Design Tech",
             "domain": "Frontend Engineering",
+            "skills": ["React", "CSS", "UI Systems"],
             "mentor": "Ritika Sen",
             "status": "On Track",
+            "batch": "Summer 2026",
+            "emergency_contact": "Priya Sharma | +91 9811111111",
+            "documents": ["Resume", "Offer Letter", "ID Proof"],
+            "notes": "Strong UI sense. Ready for more ownership on dashboard polish.",
+            "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
             "start_date": (today - timedelta(days=40)).isoformat(),
             "end_date": (today + timedelta(days=50)).isoformat(),
             "last_active": (today - timedelta(days=1)).isoformat(),
@@ -212,9 +223,17 @@ def _seed_interns():
         {
             "name": "Meera Iyer",
             "email": "meera.iyer@example.com",
+            "phone": "+91 9876543211",
+            "college": "Chennai Institute of Engineering",
             "domain": "Backend Engineering",
+            "skills": ["FastAPI", "MongoDB", "API Design"],
             "mentor": "Arjun Mehta",
             "status": "Needs Attention",
+            "batch": "Summer 2026",
+            "emergency_contact": "Suresh Iyer | +91 9822222222",
+            "documents": ["Resume", "NDA"],
+            "notes": "Needs closer deadline tracking. Backend work quality is good.",
+            "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
             "start_date": (today - timedelta(days=55)).isoformat(),
             "end_date": (today + timedelta(days=35)).isoformat(),
             "last_active": today.isoformat(),
@@ -222,9 +241,17 @@ def _seed_interns():
         {
             "name": "Kabir Patel",
             "email": "kabir.patel@example.com",
+            "phone": "+91 9876543212",
+            "college": "Western QA Institute",
             "domain": "QA Automation",
+            "skills": ["Testing", "Automation", "Documentation"],
             "mentor": "Nisha Verma",
             "status": "On Track",
+            "batch": "Summer 2026",
+            "emergency_contact": "Maya Patel | +91 9833333333",
+            "documents": ["Resume", "Offer Letter"],
+            "notes": "Reliable on documentation and test coverage.",
+            "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
             "start_date": (today - timedelta(days=28)).isoformat(),
             "end_date": (today + timedelta(days=62)).isoformat(),
             "last_active": (today - timedelta(days=2)).isoformat(),
@@ -232,9 +259,17 @@ def _seed_interns():
         {
             "name": "Ananya Roy",
             "email": "ananya.roy@example.com",
+            "phone": "+91 9876543213",
+            "college": "Data Science Academy",
             "domain": "Data Analytics",
+            "skills": ["Python", "Analytics", "Reporting"],
             "mentor": "Pooja Nair",
             "status": "Certificate Ready",
+            "batch": "Winter 2025",
+            "emergency_contact": "Soma Roy | +91 9844444444",
+            "documents": ["Resume", "Completion Review"],
+            "notes": "Consistent performer. Good candidate for final recognition.",
+            "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),
             "start_date": (today - timedelta(days=70)).isoformat(),
             "end_date": (today - timedelta(days=1)).isoformat(),
             "last_active": today.isoformat(),
@@ -376,6 +411,21 @@ def _seed_admin():
         "name": DEMO_ADMIN_NAME,
         "email": DEMO_ADMIN_EMAIL,
         "password_hash": hash_password(DEMO_ADMIN_PASSWORD),
+        "phone": "+91 9000000000",
+        "designation": "System Administrator",
+        "organization": "Intern Tracker Labs",
+        "access_level": "Super Admin",
+        "availability": "Online",
+        "profile_photo": "",
+        "notification_preferences": {
+            "attendance_alerts": True,
+            "task_alerts": True,
+            "mail_updates": True,
+            "weekly_summary": True,
+            "email_frequency": "Immediate",
+        },
+        "last_login": datetime.utcnow(),
+        "login_activity": [],
         "created_at": datetime.utcnow(),
     }
 
@@ -401,10 +451,27 @@ async def ensure_seed_data():
             demo_admin_updates["name"] = DEMO_ADMIN_NAME
         if demo_admin.get("password_hash") != expected_hash:
             demo_admin_updates["password_hash"] = expected_hash
+        for key, value in _seed_admin().items():
+            if key in {"name", "password_hash", "created_at"}:
+                continue
+            if key not in demo_admin:
+                demo_admin_updates[key] = value
         if demo_admin_updates:
             await db.admins.update_one({"_id": demo_admin["_id"]}, {"$set": demo_admin_updates})
 
     if await db.interns.count_documents({}) > 0:
+        existing_interns = await db.interns.find().to_list(length=500)
+        for intern in existing_interns:
+            password_hash = None
+            if intern.get("email", "").lower() == CHANDAN_EMAIL:
+                password_hash = hash_password(CHANDAN_PASSWORD)
+            elif not intern.get("portal_password_hash"):
+                password_hash = hash_password(DEFAULT_INTERN_PASSWORD)
+            if password_hash:
+                await db.interns.update_one(
+                    {"_id": intern["_id"]},
+                    {"$set": {"portal_password_hash": password_hash}},
+                )
         return
 
     intern_docs = _seed_interns()

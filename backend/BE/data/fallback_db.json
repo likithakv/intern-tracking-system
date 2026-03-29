@@ -11,7 +11,37 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9a"
-      }
+      },
+      "phone": "+91 9000000000",
+      "designation": "System Administrator",
+      "organization": "Intern Tracker Labs",
+      "access_level": "Super Admin",
+      "availability": "Online",
+      "profile_photo": "",
+      "notification_preferences": {
+        "attendance_alerts": true,
+        "task_alerts": true,
+        "mail_updates": true,
+        "weekly_summary": true
+      },
+      "last_login": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:06:25.136712"
+      },
+      "login_activity": [
+        {
+          "timestamp": "2026-03-29T12:06:25.136712",
+          "email": "admin@interntrack.com"
+        },
+        {
+          "timestamp": "2026-03-29T08:46:12.433861",
+          "email": "admin@interntrack.com"
+        },
+        {
+          "timestamp": "2026-03-29T08:38:51.981082",
+          "email": "admin@interntrack.com"
+        }
+      ]
     }
   ],
   "interns": [
@@ -23,11 +53,20 @@
       "status": "On Track",
       "start_date": "2026-02-16",
       "end_date": "2026-05-17",
-      "last_active": "2026-03-27",
+      "last_active": "2026-03-29",
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9b"
-      }
+      },
+      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7",
+      "phone": "",
+      "college": "",
+      "skills": [],
+      "badges": [],
+      "batch": "Current Cycle",
+      "emergency_contact": "",
+      "documents": [],
+      "notes": ""
     },
     {
       "name": "Meera Iyer",
@@ -41,7 +80,8 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9c"
-      }
+      },
+      "portal_password_hash": "a27570352d03af82011a4c057e1faa14509f0d8bf827c2993ca64786dd27411f"
     },
     {
       "name": "Kabir Patel",
@@ -55,7 +95,8 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9d"
-      }
+      },
+      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7"
     },
     {
       "name": "Ananya Roy",
@@ -69,7 +110,30 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9e"
-      }
+      },
+      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7"
+    },
+    {
+      "name": "chandan",
+      "email": "chandanchandukv2005@gmail.com",
+      "domain": "web developer",
+      "mentor": "arjun mehta",
+      "status": "On Track",
+      "start_date": "2026-01-29",
+      "end_date": "2026-04-29",
+      "last_active": "2026-03-29",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8c5b9e718a4ab4aab8603"
+      },
+      "portal_password_hash": "a27570352d03af82011a4c057e1faa14509f0d8bf827c2993ca64786dd27411f",
+      "phone": "",
+      "college": "",
+      "skills": [],
+      "batch": "Current Cycle",
+      "emergency_contact": "",
+      "documents": [],
+      "notes": ""
     }
   ],
   "tasks": [
@@ -97,8 +161,8 @@
       "description": "Connect attendance widgets with backend endpoint data.",
       "assigned_to": "69c8163a3ebd1c048e069c9b",
       "priority": "Medium",
-      "status": "In Progress",
-      "progress": 72,
+      "status": "Completed",
+      "progress": 100,
       "start_date": "2026-03-23",
       "deadline": "2026-03-31",
       "deliverable": "Attendance analytics module",
@@ -109,7 +173,31 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069ca0"
-      }
+      },
+      "latest_update_note": "completed",
+      "latest_update_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:43:33.705003"
+      },
+      "latest_updated_by": "Aarav Sharma",
+      "update_history": [
+        {
+          "intern_id": "69c8163a3ebd1c048e069c9b",
+          "intern_name": "Aarav Sharma",
+          "progress": 100,
+          "status": "Completed",
+          "note": "completed",
+          "timestamp": "2026-03-29T08:43:33.705003"
+        },
+        {
+          "intern_id": "69c8163a3ebd1c048e069c9b",
+          "intern_name": "Aarav Sharma",
+          "progress": 100,
+          "status": "In Progress",
+          "note": "completed",
+          "timestamp": "2026-03-29T08:43:21.362970"
+        }
+      ]
     },
     {
       "title": "Design MongoDB schema",
@@ -128,6 +216,9 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069ca1"
+      },
+      "notifications": {
+        "overdue_sent_on": "2026-03-29"
       }
     },
     {
@@ -147,6 +238,9 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069ca2"
+      },
+      "notifications": {
+        "behind_sent_on": "2026-03-29"
       }
     },
     {
@@ -185,6 +279,50 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069ca4"
+      }
+    },
+    {
+      "title": "Complete onboarding checklist",
+      "description": "Set up tools, review guidelines, and submit a first-week plan.",
+      "assigned_to": "69c8c5b9e718a4ab4aab8603",
+      "priority": "Medium",
+      "status": "Completed",
+      "progress": 100,
+      "start_date": "2026-03-29",
+      "deadline": "2026-04-03",
+      "deliverable": "Onboarding completion note",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T06:24:57.233857"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8c5b9e718a4ab4aab8605"
+      }
+    },
+    {
+      "title": "Design attendance and task API",
+      "description": "Build REST endpoints for attendance tracking, task updates, alerts, and reporting workflows.",
+      "assigned_to": "69c8c5b9e718a4ab4aab8603",
+      "priority": "High",
+      "start_date": "2026-03-29",
+      "deadline": "2026-04-03",
+      "status": "Pending",
+      "progress": 0,
+      "deliverable": "FastAPI backend endpoints with validation",
+      "project_template": "backend-api",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:17:29.768315"
+      },
+      "notifications": {},
+      "latest_update_note": "",
+      "latest_update_at": null,
+      "latest_updated_by": "",
+      "update_history": [],
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9185951b36cd007d610ea"
       }
     }
   ],
@@ -916,6 +1054,286 @@
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069cdc"
       }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-01-29",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:08:52.766875"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9165451b36cd007d610be"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-01-30",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:02.294633"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9165e51b36cd007d610c0"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-01-31",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:12.804676"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9166851b36cd007d610c2"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-02-01",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:20.472674"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9167051b36cd007d610c4"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-02-03",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:27.997652"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9167751b36cd007d610c6"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-02-02",
+      "status": "Leave",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:10:21.966458"
+      },
+      "absent_email_sent_on": "2026-02-02",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9168651b36cd007d610c8"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-15",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:13.884856"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916e151b36cd007d610cc"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-16",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:28.304912"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916f051b36cd007d610ce"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-17",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:39.490428"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916fb51b36cd007d610d0"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-18",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:54.896433"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9170a51b36cd007d610d2"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-19",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:13.566295"
+      },
+      "absent_email_sent_on": "2026-03-19",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9171d51b36cd007d610d4"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-20",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:40.525670"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9173851b36cd007d610d7"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-21",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:44.786491"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9173c51b36cd007d610d9"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-22",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:52.020101"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9174451b36cd007d610db"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-23",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:59.221212"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9174b51b36cd007d610dd"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-24",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:05.254261"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175151b36cd007d610df"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-25",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:10.967471"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175651b36cd007d610e1"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-26",
+      "status": "Absent",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:18.686670"
+      },
+      "absent_email_sent_on": "2026-03-26",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175e51b36cd007d610e3"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-27",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:33.971632"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9176d51b36cd007d610e6"
+      }
+    },
+    {
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "date": "2026-03-28",
+      "status": "Present",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:40.893758"
+      },
+      "absent_email_sent_on": null,
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9177451b36cd007d610e8"
+      }
     }
   ],
   "activity": [
@@ -969,6 +1387,552 @@
       "_id": {
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069ce0"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "message": "Email queued to meera.iyer@example.com: Task progress is behind schedule: Implement task alerts",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T04:54:25.455448"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8b0817267465e0c38e2bb"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8163a3ebd1c048e069c9c",
+      "message": "Email queued to meera.iyer@example.com: Task overdue: Design MongoDB schema",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T05:15:05.368373"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8b559f7d97d945bb79d23"
+      }
+    },
+    {
+      "kind": "intern",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan was added to the internship roster.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T06:24:57.226559"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8c5b9e718a4ab4aab8604"
+      }
+    },
+    {
+      "kind": "intern",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan profile details were updated.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T06:32:21.952723"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8c775e718a4ab4aab8606"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": null,
+      "message": "Email sent to interntrackernotifier@gmail.com: Intern Tracking System test email",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T07:15:25.582669"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8d18d6a8cdff6b2d714d5"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T07:25:18.236857"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8d3dec2b86570f0d757fd"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "System Admin sent a direct update to chandanchandukv2005@gmail.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T07:25:18.254342"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8d3dec2b86570f0d757fe"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "Email sent to aarav.sharma@example.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:42:00.863096"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e5d86d412a85b8d4f12e"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "System Admin sent a direct update to aarav.sharma@example.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:42:00.898757"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e5d86d412a85b8d4f12f"
+      }
+    },
+    {
+      "kind": "task",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "Aarav Sharma updated task 'Attendance API integration' to 100% (In Progress). Note: completed",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:43:21.371972"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e6296d412a85b8d4f130"
+      }
+    },
+    {
+      "kind": "task",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "Aarav Sharma updated task 'Attendance API integration' to 100% (Completed). Note: completed",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:43:33.728197"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e6356d412a85b8d4f131"
+      }
+    },
+    {
+      "kind": "intern",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "Aarav Sharma profile details were updated.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:46:49.495131"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e6f96d412a85b8d4f132"
+      }
+    },
+    {
+      "kind": "intern",
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "message": "Aarav Sharma profile details were updated.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T08:53:35.375189"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c8e88ffaff078bb04605bb"
+      }
+    },
+    {
+      "kind": "intern",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan profile details were updated.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:07:16.125890"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c915f451b36cd007d610bd"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:08:52.781156"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9165451b36cd007d610bf"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:02.310952"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9165e51b36cd007d610c1"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:12.817741"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9166851b36cd007d610c3"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:20.488444"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9167051b36cd007d610c5"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:28.004167"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9167851b36cd007d610c7"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Absent.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:42.262231"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9168651b36cd007d610c9"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: Attendance marked absent for 2026-02-02",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:09:47.987595"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9168b51b36cd007d610ca"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Leave.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:10:21.982049"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916ad51b36cd007d610cb"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:13.901658"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916e151b36cd007d610cd"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:28.316440"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916f051b36cd007d610cf"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:39.497375"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c916fb51b36cd007d610d1"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:11:54.907536"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9170a51b36cd007d610d3"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Absent.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:13.580447"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9171d51b36cd007d610d5"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: Attendance marked absent for 2026-03-19",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:18.303177"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9172251b36cd007d610d6"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:40.538019"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9173851b36cd007d610d8"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:44.794972"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9173c51b36cd007d610da"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:52.028439"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9174451b36cd007d610dc"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:12:59.235232"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9174b51b36cd007d610de"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:05.265403"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175151b36cd007d610e0"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:10.977829"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175651b36cd007d610e2"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Absent.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:18.697034"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9175e51b36cd007d610e4"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: Attendance marked absent for 2026-03-26",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:23.124217"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9176351b36cd007d610e5"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:33.985722"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9176d51b36cd007d610e7"
+      }
+    },
+    {
+      "kind": "attendance",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan attendance was marked as Present.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:13:40.903317"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9177451b36cd007d610e9"
+      }
+    },
+    {
+      "kind": "task",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "chandan received a new task: Design attendance and task API.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:17:29.781044"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9185951b36cd007d610eb"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: New task assigned: Design attendance and task API",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:17:34.620018"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9185e51b36cd007d610ec"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "Email sent to chandanchandukv2005@gmail.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:18:29.920263"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9189551b36cd007d610ed"
+      }
+    },
+    {
+      "kind": "email",
+      "intern_id": "69c8c5b9e718a4ab4aab8603",
+      "message": "System Admin sent a direct update to chandanchandukv2005@gmail.com: Update regarding your internship progress",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-29T12:18:29.936456"
+      },
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9189551b36cd007d610ee"
       }
     }
   ]

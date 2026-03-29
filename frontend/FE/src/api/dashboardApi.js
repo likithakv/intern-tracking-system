@@ -45,6 +45,15 @@ export async function updateTask(taskId, payload) {
   }
 }
 
+export async function updateTaskFromIntern(taskId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/tasks/${taskId}/intern-update`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
 export async function markAttendance(payload) {
   try {
     const response = await axiosInstance.post('/attendance/', payload);
@@ -57,6 +66,24 @@ export async function markAttendance(payload) {
 export async function updateIntern(internId, payload) {
   try {
     const response = await axiosInstance.patch(`/interns/${internId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function sendInternMessage(internId, payload) {
+  try {
+    const response = await axiosInstance.post(`/interns/${internId}/message`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function sendBroadcastMessage(payload) {
+  try {
+    const response = await axiosInstance.post('/interns/broadcast', payload);
     return response.data;
   } catch (error) {
     throw new Error(normalizeError(error));
@@ -81,11 +108,67 @@ export async function loginAdmin(payload) {
   }
 }
 
+export async function loginIntern(payload) {
+  try {
+    const response = await axiosInstance.post('/auth/intern-login', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function updateAdminProfile(adminId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/auth/profile/${adminId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function changeAdminPassword(adminId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/auth/password/${adminId}`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
 export async function downloadCertificate(internId) {
   try {
     const response = await axiosInstance.get(`/dashboard/certificates/${internId}/download`, {
       responseType: 'blob',
     });
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function downloadDashboardReport() {
+  try {
+    const response = await axiosInstance.get('/dashboard/report.csv', {
+      responseType: 'blob',
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function getInternDashboard(internId) {
+  try {
+    const response = await axiosInstance.get(`/dashboard/intern/${internId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
+export async function changeInternPassword(internId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/auth/intern-password/${internId}`, payload);
     return response.data;
   } catch (error) {
     throw new Error(normalizeError(error));

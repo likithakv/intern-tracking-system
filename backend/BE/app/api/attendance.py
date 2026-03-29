@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from app.db.mongodb import db
+from app.services.notifications import notify_absent_attendance
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
@@ -38,9 +39,12 @@ async def mark_attendance(payload: AttendanceCreate):
 
     existing = await db.attendance.find_one({"intern_id": payload.intern_id, "date": payload.date})
     if existing:
+        update_payload = {"status": payload.status, "created_at": datetime.utcnow()}
+        if payload.status == "Absent":
+            update_payload["absent_email_sent_on"] = payload.date
         await db.attendance.update_one(
             {"_id": existing["_id"]},
-            {"$set": {"status": payload.status, "created_at": datetime.utcnow()}},
+            {"$set": update_payload},
         )
         record_id = existing["_id"]
     else:
@@ -50,6 +54,7 @@ async def mark_attendance(payload: AttendanceCreate):
                 "date": payload.date,
                 "status": payload.status,
                 "created_at": datetime.utcnow(),
+                "absent_email_sent_on": payload.date if payload.status == "Absent" else None,
             }
         )
         record_id = inserted.inserted_id
@@ -64,4 +69,6 @@ async def mark_attendance(payload: AttendanceCreate):
     )
 
     saved = await db.attendance.find_one({"_id": record_id})
+    if payload.status == "Absent" and (not existing or existing.get("absent_email_sent_on") != payload.date):
+        await notify_absent_attendance(intern, payload.date)
     return serialize_attendance(saved)

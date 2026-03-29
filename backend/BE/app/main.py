@@ -1,16 +1,29 @@
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 from app.api import attendance, auth, interns, reports, tasks
 from app.db.mongodb import ensure_seed_data
+from app.services.notifications import notification_worker, process_pending_task_notifications
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await ensure_seed_data()
-    yield
+    await process_pending_task_notifications()
+    worker = asyncio.create_task(notification_worker())
+    try:
+        yield
+    finally:
+        worker.cancel()
+        with suppress(asyncio.CancelledError):
+            await worker
 
 
 app = FastAPI(
