@@ -256,7 +256,6 @@ function AuthScreen({
   accessMode,
   authMode, loginForm, registerForm, onLoginChange, onRegisterChange,
   onLogin, onRegister, setAuthMode, setAccessMode, authLoading, error,
-  certificateLookupId, setCertificateLookupId, onVerifyCertificate, certificateLookupResult,
 }) {
   return (
     <div className="auth-shell">
@@ -307,12 +306,6 @@ function AuthScreen({
               <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Creating...' : 'Create Admin'}</button>
             </form>
           )}
-          <form className="auth-form top-gap" onSubmit={onVerifyCertificate}>
-            <strong>Public certificate verification</strong>
-            <label>Certificate ID<input value={certificateLookupId} onChange={(event) => setCertificateLookupId(event.target.value)} placeholder="ITS-XXXXXXXXXX" required /></label>
-            <button className="secondary-button auth-submit" type="submit">Verify Certificate</button>
-            {certificateLookupResult ? <div className="helper-note compact-note"><span>{certificateLookupResult.valid ? 'Certificate is genuine' : 'Certificate found'}</span><span>{certificateLookupResult.internName} | {certificateLookupResult.domain}</span><span>{certificateLookupResult.issuedForCycle}</span></div> : null}
-          </form>
         </div>
       </div>
     </div>
@@ -2186,10 +2179,6 @@ function App() {
         setAccessMode={setAccessMode}
         authLoading={authLoading}
         error={error}
-        certificateLookupId={certificateLookupId}
-        setCertificateLookupId={setCertificateLookupId}
-        onVerifyCertificate={handleCertificateVerification}
-        certificateLookupResult={certificateLookupResult}
       />
     );
   }
@@ -2283,6 +2272,22 @@ function App() {
                   <label>Name<input value={adminProfileForm.name} onChange={(event) => setAdminProfileForm((current) => ({ ...current, name: event.target.value }))} required /></label>
                   <label>Email<input type="email" value={adminProfileForm.email} onChange={(event) => setAdminProfileForm((current) => ({ ...current, email: event.target.value }))} required /></label>
                   <label>Role<input value={adminProfileForm.role} onChange={(event) => setAdminProfileForm((current) => ({ ...current, role: event.target.value }))} required /></label>
+                  <label>Phone<input value={adminProfileForm.phone} onChange={(event) => setAdminProfileForm((current) => ({ ...current, phone: event.target.value }))} required /></label>
+                  <label>Designation<input value={adminProfileForm.designation} onChange={(event) => setAdminProfileForm((current) => ({ ...current, designation: event.target.value }))} required /></label>
+                  <label>Organization<input value={adminProfileForm.organization} onChange={(event) => setAdminProfileForm((current) => ({ ...current, organization: event.target.value }))} required /></label>
+                  <label>Access level<select value={adminProfileForm.access_level} onChange={(event) => setAdminProfileForm((current) => ({ ...current, access_level: event.target.value }))}><option>Super Admin</option><option>Admin</option><option>Coordinator</option><option>Mentor</option></select></label>
+                  <label>Availability<select value={adminProfileForm.availability} onChange={(event) => setAdminProfileForm((current) => ({ ...current, availability: event.target.value }))}><option>Online</option><option>Busy</option><option>Away</option></select></label>
+                  <label>Profile photo<input type="file" accept="image/*" onChange={handleAdminProfilePhotoUpload} /></label>
+                  {adminProfileForm.profile_photo ? <img className="profile-photo-preview intern-profile-photo-large" src={adminProfileForm.profile_photo} alt={adminProfileForm.name || 'Admin profile'} /> : null}
+                  <div className="settings-toggle-grid detail-card-wide">
+                    {Object.entries(adminProfileForm.notification_preferences || {}).filter(([key]) => key !== 'email_frequency').map(([key, value]) => (
+                      <label key={key} className="settings-toggle">
+                        <input type="checkbox" checked={Boolean(value)} onChange={(event) => setAdminProfileForm((current) => ({ ...current, notification_preferences: { ...current.notification_preferences, [key]: event.target.checked } }))} />
+                        <span>{key.replace(/_/g, ' ')}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <label>Email frequency<select value={adminProfileForm.notification_preferences?.email_frequency || 'Immediate'} onChange={(event) => setAdminProfileForm((current) => ({ ...current, notification_preferences: { ...current.notification_preferences, email_frequency: event.target.value } }))}><option>Immediate</option><option>Daily</option><option>Weekly</option></select></label>
                   <button type="submit" className="primary-button">Save Profile</button>
                 </form>
               ) : null}

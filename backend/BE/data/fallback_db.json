@@ -66,7 +66,9 @@
       "batch": "Current Cycle",
       "emergency_contact": "",
       "documents": [],
-      "notes": ""
+      "notes": "",
+      "archived": false,
+      "certificate_id": "ITS-1F188FAD5C"
     },
     {
       "name": "Meera Iyer",
@@ -81,7 +83,9 @@
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9c"
       },
-      "portal_password_hash": "a27570352d03af82011a4c057e1faa14509f0d8bf827c2993ca64786dd27411f"
+      "portal_password_hash": "a27570352d03af82011a4c057e1faa14509f0d8bf827c2993ca64786dd27411f",
+      "archived": false,
+      "certificate_id": "ITS-892CA293E6"
     },
     {
       "name": "Kabir Patel",
@@ -96,7 +100,9 @@
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9d"
       },
-      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7"
+      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7",
+      "archived": false,
+      "certificate_id": "ITS-B3DB8E38D3"
     },
     {
       "name": "Ananya Roy",
@@ -111,7 +117,9 @@
         "__type": "objectid",
         "value": "69c8163a3ebd1c048e069c9e"
       },
-      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7"
+      "portal_password_hash": "534d9b45e4168ad5e7ab39ddde0387982ec6a2a18b992f62738b23fcde72f7e7",
+      "archived": false,
+      "certificate_id": "ITS-372A14B6A5"
     },
     {
       "name": "chandan",
@@ -133,7 +141,9 @@
       "batch": "Current Cycle",
       "emergency_contact": "",
       "documents": [],
-      "notes": ""
+      "notes": "",
+      "archived": false,
+      "certificate_id": "ITS-3D6C6CFD0A"
     }
   ],
   "tasks": [
@@ -1935,5 +1945,43 @@
         "value": "69c9189551b36cd007d610ee"
       }
     }
-  ]
+  ],
+  "evaluations": [
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9b",
+      "communication": 8,
+      "technical_skill": 9,
+      "teamwork": 8,
+      "ownership": 8,
+      "comments": "Strong progress and clear communication.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-25T13:24:30.427858"
+      },
+      "evaluation_date": "2026-03-25",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9280e41acedc70c4fa510"
+      }
+    },
+    {
+      "intern_id": "69c8163a3ebd1c048e069c9d",
+      "communication": 7,
+      "technical_skill": 7,
+      "teamwork": 8,
+      "ownership": 7,
+      "comments": "Reliable delivery, should share blockers earlier.",
+      "created_at": {
+        "__type": "datetime",
+        "value": "2026-03-27T13:24:30.427858"
+      },
+      "evaluation_date": "2026-03-27",
+      "_id": {
+        "__type": "objectid",
+        "value": "69c9280e41acedc70c4fa511"
+      }
+    }
+  ],
+  "leave_requests": [],
+  "audit_logs": []
 }
