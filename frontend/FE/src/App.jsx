@@ -40,6 +40,7 @@ import {
   registerAdmin,
   sendBroadcastMessage,
   sendInternMessage,
+  reviewTaskSubmission,
   updateAdminProfile,
   updateIntern,
   updateTaskFromIntern,
@@ -62,9 +63,17 @@ const toneClassMap = {
   warning: 'tone-warning',
   danger: 'tone-danger',
 };
+const documentSlotLabels = {
+  resume: 'Resume',
+  offer_letter: 'Offer Letter',
+  nda: 'NDA',
+  completion_report: 'Completion Report',
+  certificate_copy: 'Certificate Copy',
+};
 const emptyInternForm = {
   name: '', email: '', phone: '', college: '', domain: '', skills: '', mentor: '', batch: 'Current Cycle',
   emergency_contact: '', notes: '', start_date: '', end_date: '', status: 'On Track',
+  document_records: {},
 };
 const emptyTaskForm = {
   title: '', description: '', assigned_to: '', priority: 'Medium', start_date: '',
@@ -101,6 +110,11 @@ const emptyInternTaskUpdateForm = {
   progress: 0,
   status: 'In Progress',
   update_note: '',
+  github_link: '',
+  deployed_link: '',
+  proof_note: '',
+  report_file: null,
+  screenshot_file: null,
 };
 const internSections = [
   { id: 'profile', label: 'My Profile', icon: Users },
@@ -147,6 +161,36 @@ function relativeTime(value) {
   if (absHours < 24) return diffHours <= 0 ? `${absHours || 1}h ago` : `in ${absHours}h`;
   const days = Math.round(absHours / 24);
   return diffHours <= 0 ? `${days}d ago` : `in ${days}d`;
+}
+
+function getDocumentEntries(records) {
+  return Object.entries(records || {}).map(([key, value]) => ({
+    key,
+    label: value?.label || documentSlotLabels[key] || key,
+    file_name: value?.file_name || '',
+    content_type: value?.content_type || '',
+    data_url: value?.data_url || '',
+    uploaded_at: value?.uploaded_at || '',
+  }));
+}
+
+function readFileAsDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Unable to read file.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function downloadDataUrl(dataUrl, fileName) {
+  if (!dataUrl) return;
+  const link = document.createElement('a');
+  link.href = dataUrl;
+  link.download = fileName || 'download';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
 }
 
 function PerformanceLineGraph({ items }) {
@@ -503,6 +547,7 @@ function App() {
       start_date: intern.startDate,
       end_date: intern.endDate,
       status: intern.status === 'Certificate Ready' ? 'On Track' : intern.status,
+      document_records: intern.documentRecords || {},
     });
     setShowInternModal(true);
   };
@@ -713,12 +758,64 @@ function App() {
     }
   };
 
+  const handleInternDocumentUpload = async (slot, file) => {
+    if (!file) return;
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      setInternForm((current) => ({
+        ...current,
+        document_records: {
+          ...(current.document_records || {}),
+          [slot]: {
+            label: documentSlotLabels[slot] || slot,
+            file_name: file.name,
+            content_type: file.type || 'application/octet-stream',
+            data_url: dataUrl,
+            uploaded_at: new Date().toISOString(),
+          },
+        },
+      }));
+    } catch (err) {
+      setError(err.message || 'Unable to upload document.');
+    }
+  };
+
+  const handleInternDocumentRemove = (slot) => {
+    setInternForm((current) => {
+      const nextRecords = { ...(current.document_records || {}) };
+      delete nextRecords[slot];
+      return { ...current, document_records: nextRecords };
+    });
+  };
+
+  const handleTaskProofFileUpload = async (field, file) => {
+    if (!file) return;
+    try {
+      const dataUrl = await readFileAsDataUrl(file);
+      setInternTaskUpdateForm((current) => ({
+        ...current,
+        [field]: {
+          file_name: file.name,
+          content_type: file.type || 'application/octet-stream',
+          data_url: dataUrl,
+        },
+      }));
+    } catch (err) {
+      setError(err.message || 'Unable to upload proof file.');
+    }
+  };
+
   const openInternTaskUpdate = (task) => {
     setInternTaskUpdateForm({
       task_id: task.id,
       progress: task.progress || 0,
       status: task.status === 'Completed' ? 'Completed' : 'In Progress',
       update_note: '',
+      github_link: task.submission?.github_link || '',
+      deployed_link: task.submission?.deployed_link || '',
+      proof_note: task.submission?.note || '',
+      report_file: task.submission?.report_file || null,
+      screenshot_file: task.submission?.screenshot_file || null,
     });
     setShowInternTaskUpdateModal(true);
   };
@@ -733,6 +830,13 @@ function App() {
         progress: Number(internTaskUpdateForm.progress),
         status: internTaskUpdateForm.status,
         update_note: internTaskUpdateForm.update_note,
+        submission: {
+          github_link: internTaskUpdateForm.github_link,
+          deployed_link: internTaskUpdateForm.deployed_link,
+          note: internTaskUpdateForm.proof_note,
+          report_file: internTaskUpdateForm.report_file,
+          screenshot_file: internTaskUpdateForm.screenshot_file,
+        },
       });
       setShowInternTaskUpdateModal(false);
       setInternTaskUpdateForm(emptyInternTaskUpdateForm);
@@ -754,14 +858,16 @@ function App() {
         await updateIntern(editingIntern.id, {
           ...internForm,
           skills: internForm.skills.split(',').map((item) => item.trim()).filter(Boolean),
-          documents: editingIntern.documents || [],
+          documents: getDocumentEntries(internForm.document_records).map((item) => item.label),
+          document_records: internForm.document_records || {},
         });
         setSuccessMessage('Intern updated successfully. Related active deadlines were synced where needed.');
       } else {
         await createIntern({
           ...internForm,
           skills: internForm.skills.split(',').map((item) => item.trim()).filter(Boolean),
-          documents: [],
+          documents: getDocumentEntries(internForm.document_records).map((item) => item.label),
+          document_records: internForm.document_records || {},
         });
         setSuccessMessage('Intern added successfully.');
       }
@@ -773,6 +879,20 @@ function App() {
       setError(err.message || 'Unable to save intern.');
     } finally {
       setIsSavingIntern(false);
+    }
+  };
+
+  const handleSubmissionReview = async (taskId, reviewStatus) => {
+    try {
+      setError('');
+      await reviewTaskSubmission(taskId, {
+        review_status: reviewStatus,
+        admin_feedback: reviewStatus === 'Rejected' ? 'Please update the proof and resubmit.' : 'Submission reviewed and accepted.',
+      });
+      setSuccessMessage(`Task proof ${reviewStatus.toLowerCase()} successfully.`);
+      await loadDashboard();
+    } catch (err) {
+      setError(err.message || 'Unable to review task proof.');
     }
   };
 
@@ -1266,9 +1386,26 @@ function App() {
                     <small>{task.latest_update_at ? relativeTime(task.latest_update_at) : 'Just now'}</small>
                   </div>
                 ) : null}
-                <button className="secondary-button" type="button" onClick={() => handleTaskStatusUpdate(task.id, task.status, task.progress)}>
-                  {task.status === 'Completed' ? 'Move To In Progress' : 'Mark Completed'}
-                </button>
+                {task.submission?.submitted_at ? (
+                  <div className="proof-panel">
+                    <strong>Submitted proof</strong>
+                    <span>Review status: {task.submission.review_status || 'Pending'}</span>
+                    {task.submission.github_link ? <a href={task.submission.github_link} target="_blank" rel="noreferrer">Open GitHub link</a> : null}
+                    {task.submission.deployed_link ? <a href={task.submission.deployed_link} target="_blank" rel="noreferrer">Open deployed link</a> : null}
+                    {task.submission.report_file?.data_url ? <button className="table-action" type="button" onClick={() => downloadDataUrl(task.submission.report_file.data_url, task.submission.report_file.file_name)}>Download report</button> : null}
+                    {task.submission.screenshot_file?.data_url ? <button className="table-action" type="button" onClick={() => downloadDataUrl(task.submission.screenshot_file.data_url, task.submission.screenshot_file.file_name)}>Download screenshot</button> : null}
+                    {task.submission.note ? <div className="helper-note compact-note">{task.submission.note}</div> : null}
+                    <div className="table-action-row">
+                      <button className="table-action" type="button" onClick={() => handleSubmissionReview(task.id, 'Approved')}>Approve Proof</button>
+                      <button className="table-action" type="button" onClick={() => handleSubmissionReview(task.id, 'Rejected')}>Reject Proof</button>
+                    </div>
+                  </div>
+                ) : null}
+                <div className="table-action-row">
+                  <button className="secondary-button" type="button" onClick={() => handleTaskStatusUpdate(task.id, task.status, task.progress)}>
+                    {task.status === 'Completed' ? 'Move To In Progress' : 'Mark Completed'}
+                  </button>
+                </div>
               </motion.div>
             );
           })}
@@ -1497,6 +1634,7 @@ function App() {
                   <div className="detail-card"><strong>Batch</strong><span>{internDashboard.profile.batch}</span></div>
                   <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{internDashboard.profile.skills.join(', ') || 'No skills added yet'}</span></div>
                   <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{internDashboard.profile.badges?.join(', ') || 'No badges earned yet'}</span></div>
+                  <div className="detail-card detail-card-wide"><strong>Documents</strong><span>{getDocumentEntries(internDashboard.profile.documentRecords).map((item) => item.label).join(', ') || 'No documents uploaded yet'}</span></div>
                 </div>
               </motion.article>
               <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
@@ -1545,6 +1683,12 @@ function App() {
                     <p>{task.description}</p>
                     <div className="task-meta"><span>Start: {formatDate(task.start_date)}</span><span>Deadline: {formatDate(task.deadline)}</span><span>Progress: {task.progress}%</span></div>
                     <div className="mini-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${task.progress}%` }} transition={{ duration: 0.8 }} /></div>
+                    {task.submission?.submitted_at ? (
+                      <div className="helper-note compact-note">
+                        Submission status: <strong>{task.submission.review_status || 'Pending'}</strong>
+                        {task.submission.admin_feedback ? <span>{task.submission.admin_feedback}</span> : null}
+                      </div>
+                    ) : null}
                     <button className="secondary-button" type="button" onClick={() => openInternTaskUpdate(task)}>Update Mentor/Admin</button>
                   </div>
                 ))}
@@ -1575,8 +1719,18 @@ function App() {
                 <div className="detail-card"><strong>Batch</strong><span>{internDashboard.profile.batch}</span></div>
                 <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{internDashboard.profile.skills.join(', ') || 'No skills added yet'}</span></div>
                 <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{internDashboard.profile.badges?.join(', ') || 'No badges earned yet'}</span></div>
+                <div className="detail-card detail-card-wide"><strong>Documents</strong><span>{getDocumentEntries(internDashboard.profile.documentRecords).map((item) => item.label).join(', ') || 'No documents uploaded yet'}</span></div>
                 <div className="detail-card"><strong>Mentor</strong><span>{internDashboard.profile.mentor}</span></div>
                 <div className="detail-card"><strong>Duration</strong><span>{formatDate(internDashboard.profile.startDate)} to {formatDate(internDashboard.profile.endDate)}</span></div>
+              </div>
+              <div className="document-grid top-gap">
+                {getDocumentEntries(internDashboard.profile.documentRecords).map((doc) => (
+                  <div key={doc.key} className="document-tile">
+                    <strong>{doc.label}</strong>
+                    <span>{doc.file_name || 'No file uploaded yet'}</span>
+                    {doc.data_url ? <button className="table-action" type="button" onClick={() => downloadDataUrl(doc.data_url, doc.file_name || `${doc.label}.file`)}>Download</button> : null}
+                  </div>
+                ))}
               </div>
             </motion.article>
           </section>
@@ -1706,6 +1860,12 @@ function App() {
                 </label>
                 <label>Status<select value={internTaskUpdateForm.status} onChange={(event) => setInternTaskUpdateForm((current) => ({ ...current, status: event.target.value }))}><option>Pending</option><option>In Progress</option><option>Completed</option></select></label>
                 <label>Update note<textarea className="message-textarea" value={internTaskUpdateForm.update_note} onChange={(event) => setInternTaskUpdateForm((current) => ({ ...current, update_note: event.target.value }))} placeholder="Describe what you completed and any blockers..." required /></label>
+                <label>GitHub link<input value={internTaskUpdateForm.github_link} onChange={(event) => setInternTaskUpdateForm((current) => ({ ...current, github_link: event.target.value }))} placeholder="https://github.com/..." /></label>
+                <label>Deployed link<input value={internTaskUpdateForm.deployed_link} onChange={(event) => setInternTaskUpdateForm((current) => ({ ...current, deployed_link: event.target.value }))} placeholder="https://..." /></label>
+                <label>Proof note<textarea className="message-textarea" value={internTaskUpdateForm.proof_note} onChange={(event) => setInternTaskUpdateForm((current) => ({ ...current, proof_note: event.target.value }))} placeholder="Mention what is included in your proof submission..." /></label>
+                <label>PDF or report upload<input type="file" accept=".pdf,.doc,.docx,.txt,.ppt,.pptx" onChange={(event) => handleTaskProofFileUpload('report_file', event.target.files?.[0])} /></label>
+                <label>Screenshot upload<input type="file" accept="image/*" onChange={(event) => handleTaskProofFileUpload('screenshot_file', event.target.files?.[0])} /></label>
+                {(internTaskUpdateForm.report_file || internTaskUpdateForm.screenshot_file) ? <div className="helper-note compact-note">{internTaskUpdateForm.report_file ? <span>Report: {internTaskUpdateForm.report_file.file_name}</span> : null}{internTaskUpdateForm.screenshot_file ? <span>Screenshot: {internTaskUpdateForm.screenshot_file.file_name}</span> : null}</div> : null}
                 <button className="primary-button submit-button" type="submit" disabled={isSubmittingInternTaskUpdate}>{isSubmittingInternTaskUpdate ? 'Submitting...' : 'Send Update'}</button>
               </form>
             </div>
@@ -2005,6 +2165,23 @@ function App() {
               <label>Start date<input type="date" value={internForm.start_date} onChange={(event) => setInternForm((current) => ({ ...current, start_date: event.target.value }))} required /></label>
               <label>End date<input type="date" value={internForm.end_date} onChange={(event) => setInternForm((current) => ({ ...current, end_date: event.target.value }))} required /></label>
               <label>Notes<textarea value={internForm.notes} onChange={(event) => setInternForm((current) => ({ ...current, notes: event.target.value }))} /></label>
+              <div className="detail-card detail-card-wide upload-manager">
+                <strong>Document Management</strong>
+                <span>One upload and download area for all required intern records.</span>
+                <div className="document-grid">
+                  {Object.entries(documentSlotLabels).map(([slot, label]) => (
+                    <div key={slot} className="document-tile">
+                      <strong>{label}</strong>
+                      <span>{internForm.document_records?.[slot]?.file_name || 'No file uploaded yet'}</span>
+                      <input type="file" onChange={(event) => handleInternDocumentUpload(slot, event.target.files?.[0])} />
+                      <div className="table-action-row">
+                        {internForm.document_records?.[slot]?.data_url ? <button className="table-action" type="button" onClick={() => downloadDataUrl(internForm.document_records[slot].data_url, internForm.document_records[slot].file_name)}>Download</button> : null}
+                        {internForm.document_records?.[slot]?.data_url ? <button className="table-action" type="button" onClick={() => handleInternDocumentRemove(slot)}>Remove</button> : null}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <button className="primary-button submit-button" type="submit" disabled={isSavingIntern}>{isSavingIntern ? 'Saving...' : editingIntern ? 'Save Changes' : 'Save Intern'}</button>
             </form>
           </div>
@@ -2092,6 +2269,18 @@ function App() {
               <div className="detail-card detail-card-wide"><strong>Badges</strong><span>{selectedInternDetail.earnedBadges?.join(', ') || selectedInternDetail.badges?.join(', ') || 'No badges earned yet'}</span></div>
               <div className="detail-card detail-card-wide"><strong>Skills</strong><span>{selectedInternDetail.skills?.join(', ') || 'No skills added'}</span></div>
               <div className="detail-card detail-card-wide"><strong>Admin Notes</strong><span>{selectedInternDetail.notes || 'No notes yet'}</span></div>
+              <div className="detail-card detail-card-wide">
+                <strong>Stored Files</strong>
+                <div className="document-grid top-gap">
+                  {getDocumentEntries(selectedInternDetail.documentRecords).length ? getDocumentEntries(selectedInternDetail.documentRecords).map((doc) => (
+                    <div key={doc.key} className="document-tile">
+                      <strong>{doc.label}</strong>
+                      <span>{doc.file_name || 'Document slot created'}</span>
+                      {doc.data_url ? <button className="table-action" type="button" onClick={() => downloadDataUrl(doc.data_url, doc.file_name || `${doc.label}.file`)}>Download</button> : <span className="muted-copy">No uploaded file yet</span>}
+                    </div>
+                  )) : <span className="muted-copy">No stored files yet.</span>}
+                </div>
+              </div>
             </div>
           </div>
         </div>

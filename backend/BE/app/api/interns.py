@@ -10,6 +10,14 @@ from app.services.notifications import send_email, smtp_is_configured
 router = APIRouter(prefix="/interns", tags=["Interns"])
 
 
+class DocumentRecord(BaseModel):
+    label: str = Field(min_length=2, max_length=80)
+    file_name: str = Field(min_length=1, max_length=200)
+    content_type: str = Field(min_length=3, max_length=120)
+    data_url: str = Field(min_length=10, max_length=2000000)
+    uploaded_at: str | None = None
+
+
 class InternCreate(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     email: EmailStr
@@ -23,6 +31,7 @@ class InternCreate(BaseModel):
     batch: str | None = Field(default="Current Cycle", max_length=80)
     emergency_contact: str | None = Field(default="", max_length=140)
     documents: list[str] | None = []
+    document_records: dict[str, DocumentRecord] | None = None
     notes: str | None = Field(default="", max_length=1200)
     profile_photo: str | None = Field(default="", max_length=2000000)
     start_date: str
@@ -42,6 +51,7 @@ class InternUpdate(BaseModel):
     batch: str | None = Field(default=None, max_length=80)
     emergency_contact: str | None = Field(default=None, max_length=140)
     documents: list[str] | None = None
+    document_records: dict[str, DocumentRecord] | None = None
     notes: str | None = Field(default=None, max_length=1200)
     profile_photo: str | None = Field(default=None, max_length=2000000)
     start_date: str | None = None
@@ -95,6 +105,7 @@ async def create_intern(payload: InternCreate):
         "batch": payload.batch or "Current Cycle",
         "emergency_contact": payload.emergency_contact or "",
         "documents": payload.documents or [],
+        "document_records": payload.document_records or {},
         "notes": payload.notes or "",
         "profile_photo": payload.profile_photo or "",
         "portal_password_hash": hash_password(DEFAULT_INTERN_PASSWORD),

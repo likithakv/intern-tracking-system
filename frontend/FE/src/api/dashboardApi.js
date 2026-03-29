@@ -54,6 +54,15 @@ export async function updateTaskFromIntern(taskId, payload) {
   }
 }
 
+export async function reviewTaskSubmission(taskId, payload) {
+  try {
+    const response = await axiosInstance.patch(`/tasks/${taskId}/submission-review`, payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
 export async function markAttendance(payload) {
   try {
     const response = await axiosInstance.post('/attendance/', payload);

@@ -10,6 +10,20 @@ from app.services.notifications import get_project_templates, maybe_notify_for_t
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
+class TaskProofFile(BaseModel):
+    file_name: str = Field(min_length=1, max_length=200)
+    content_type: str = Field(min_length=3, max_length=120)
+    data_url: str = Field(min_length=10, max_length=2000000)
+
+
+class TaskSubmission(BaseModel):
+    github_link: str | None = Field(default="", max_length=300)
+    deployed_link: str | None = Field(default="", max_length=300)
+    report_file: TaskProofFile | None = None
+    screenshot_file: TaskProofFile | None = None
+    note: str | None = Field(default="", max_length=800)
+
+
 class TaskCreate(BaseModel):
     title: str = Field(min_length=3, max_length=120)
     description: str = Field(min_length=5, max_length=400)
@@ -28,11 +42,17 @@ class TaskUpdate(BaseModel):
     progress: int | None = Field(default=None, ge=0, le=100)
 
 
+class TaskSubmissionReview(BaseModel):
+    review_status: str = Field(pattern="^(Approved|Rejected|Pending)$")
+    admin_feedback: str | None = Field(default="", max_length=600)
+
+
 class InternTaskUpdate(BaseModel):
     intern_id: str
     progress: int = Field(ge=0, le=100)
     status: str
     update_note: str = Field(min_length=5, max_length=500)
+    submission: TaskSubmission | None = None
 
 
 def serialize_task(task):
@@ -68,6 +88,18 @@ async def create_task(payload: TaskCreate):
     task_doc["latest_update_at"] = None
     task_doc["latest_updated_by"] = ""
     task_doc["update_history"] = []
+    task_doc["submission"] = {
+        "github_link": "",
+        "deployed_link": "",
+        "report_file": None,
+        "screenshot_file": None,
+        "note": "",
+        "review_status": "Pending",
+        "admin_feedback": "",
+        "submitted_at": None,
+        "approved_at": None,
+        "approved_by": "",
+    }
     result = await db.tasks.insert_one(task_doc)
 
     await db.activity.insert_one(
@@ -136,6 +168,18 @@ async def intern_update_task(task_id: str, payload: InternTaskUpdate):
         "latest_update_at": datetime.utcnow(),
         "latest_updated_by": intern["name"],
     }
+    if payload.submission:
+        existing_submission = dict(task.get("submission") or {})
+        submission_payload = payload.submission.model_dump()
+        update_data["submission"] = {
+            **existing_submission,
+            **submission_payload,
+            "review_status": "Pending",
+            "admin_feedback": "",
+            "submitted_at": datetime.utcnow().isoformat(),
+            "approved_at": None,
+            "approved_by": "",
+        }
     task_update_history = list(task.get("update_history", []))
     task_update_history.insert(
         0,
@@ -168,5 +212,38 @@ async def intern_update_task(task_id: str, payload: InternTaskUpdate):
     if changed:
         await db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": {"notifications": notifications}})
         updated = await db.tasks.find_one({"_id": ObjectId(task_id)})
+
+    return serialize_task(updated)
+
+
+@router.patch("/{task_id}/submission-review")
+async def review_task_submission(task_id: str, payload: TaskSubmissionReview):
+    if not ObjectId.is_valid(task_id):
+        raise HTTPException(status_code=400, detail="Invalid task id.")
+
+    task = await db.tasks.find_one({"_id": ObjectId(task_id)})
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found.")
+
+    submission = dict(task.get("submission") or {})
+    if not submission.get("submitted_at"):
+        raise HTTPException(status_code=400, detail="No task submission found for review.")
+
+    submission["review_status"] = payload.review_status
+    submission["admin_feedback"] = (payload.admin_feedback or "").strip()
+    submission["approved_at"] = datetime.utcnow().isoformat() if payload.review_status == "Approved" else None
+    submission["approved_by"] = "Admin Review"
+
+    await db.tasks.update_one({"_id": ObjectId(task_id)}, {"$set": {"submission": submission}})
+    updated = await db.tasks.find_one({"_id": ObjectId(task_id)})
+
+    await db.activity.insert_one(
+        {
+            "kind": "task",
+            "intern_id": updated["assigned_to"],
+            "message": f"Task proof for '{updated['title']}' was {payload.review_status.lower()} by admin.",
+            "created_at": datetime.utcnow(),
+        }
+    )
 
     return serialize_task(updated)

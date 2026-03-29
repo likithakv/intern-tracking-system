@@ -1310,6 +1310,38 @@ td span {
   grid-column: 1 / -1;
 }
 
+.document-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.document-tile,
+.proof-panel {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 18px;
+  border: 1px solid #d7e0ea;
+  background: #f8fbff;
+}
+
+.document-tile span,
+.proof-panel span,
+.proof-panel a {
+  color: #516074;
+  font-size: 0.92rem;
+}
+
+.upload-manager {
+  align-content: start;
+}
+
+.compact-note {
+  display: grid;
+  gap: 6px;
+}
+
 .recipient-picker {
   grid-column: 1 / -1;
   display: grid;

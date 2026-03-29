@@ -83,6 +83,26 @@ def _earned_badges(attendance_rate, performance_score, task_completion_rate, tot
     return badges[:3]
 
 
+def _normalize_document_records(intern):
+    records = dict(intern.get("document_records") or {})
+    legacy_documents = intern.get("documents") or []
+    for label in legacy_documents:
+        if not isinstance(label, str):
+            continue
+        key = label.lower().replace(" ", "_")
+        records.setdefault(
+            key,
+            {
+                "label": label,
+                "file_name": "",
+                "content_type": "",
+                "data_url": "",
+                "uploaded_at": None,
+            },
+        )
+    return records
+
+
 def _serialize_intern_portal(intern, tasks, attendance_records, activity, today):
     completed_tasks = sum(1 for task in tasks if task["status"] == "Completed")
     attendance_rate = _attendance_rate(attendance_records)
@@ -101,6 +121,7 @@ def _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
             "domain": intern.get("domain", ""),
             "skills": intern.get("skills", []),
             "badges": earned_badges,
+            "documentRecords": _normalize_document_records(intern),
             "mentor": intern.get("mentor", ""),
             "batch": intern.get("batch", "Current Cycle"),
             "status": "Certificate Ready" if certificate_ready else intern.get("status", "On Track"),
@@ -124,6 +145,7 @@ def _serialize_intern_portal(intern, tasks, attendance_records, activity, today)
                 "start_date": task["start_date"],
                 "deadline": task["deadline"],
                 "deliverable": task.get("deliverable", "Project update"),
+                "submission": task.get("submission", {}),
             }
             for task in sorted(tasks, key=lambda item: item["deadline"])
         ],
@@ -339,6 +361,7 @@ async def get_dashboard():
                 "batch": intern.get("batch", "Current Cycle"),
                 "emergency_contact": intern.get("emergency_contact", ""),
                 "documents": intern.get("documents", []),
+                "documentRecords": _normalize_document_records(intern),
                 "notes": intern.get("notes", ""),
                 "attendanceRate": attendance_rate,
                 "completedTasks": completed_tasks,
