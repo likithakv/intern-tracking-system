@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 
 from app.db.mongodb import db
-from app.services.notifications import notify_absent_attendance
+from app.services.notifications import notify_attendance_marked
 
 router = APIRouter(prefix="/attendance", tags=["Attendance"])
 
@@ -101,8 +101,9 @@ async def mark_attendance(payload: AttendanceCreate):
     )
 
     saved = await db.attendance.find_one({"_id": record_id})
-    if payload.status == "Absent" and (not existing or existing.get("absent_email_sent_on") != payload.date):
-        await notify_absent_attendance(intern, payload.date)
+    previous_status = existing.get("status") if existing else None
+    if (not existing) or previous_status != payload.status:
+        await notify_attendance_marked(intern, payload.date, payload.status)
     return serialize_attendance(saved)
 
 

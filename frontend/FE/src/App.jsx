@@ -1513,24 +1513,14 @@ function App() {
   const renderAttendance = () => (
     <section className="dashboard-grid">
       <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="panel-header"><div><p className="panel-kicker">Performance & Evaluation</p><h2>Mark attendance and review outcomes</h2></div><Star size={20} /></div>
-        {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
+        <div className="panel-header"><div><p className="panel-kicker">Attendance Tracking</p><h2>Mark intern attendance</h2></div><CalendarRange size={20} /></div>
         <form className="stack-form compact-form" onSubmit={handleAttendanceSubmit}>
           <label>Intern<select value={attendanceForm.intern_id} onChange={(event) => setAttendanceForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
           <label>Date<input type="date" value={attendanceForm.date} onChange={(event) => setAttendanceForm((current) => ({ ...current, date: event.target.value }))} required /></label>
           <label>Status<select value={attendanceForm.status} onChange={(event) => setAttendanceForm((current) => ({ ...current, status: event.target.value }))}><option>Present</option><option>Absent</option><option>Leave</option></select></label>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Mark Attendance'}</motion.button>
         </form>
-        <form className="stack-form compact-form top-gap" onSubmit={handleEvaluationSubmit}>
-          <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
-          <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
-          <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
-          <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
-          <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
-          <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
-          <label className="detail-card-wide">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Evaluation'}</motion.button>
-        </form>
+        <div className="helper-note">Whenever admin marks attendance, the selected intern now receives an immediate attendance status email update.</div>
         <div className="evaluation-grid">
           {filteredPerformance.map((item) => (
             <motion.div key={item.internId} className="evaluation-card" whileHover={{ y: -5 }}>
@@ -1553,6 +1543,20 @@ function App() {
             </motion.div>
           ))}
         </div>
+      </motion.article>
+      <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="panel-header"><div><p className="panel-kicker">Evaluation Form</p><h2>Review intern performance separately</h2></div><Star size={20} /></div>
+        {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
+        <form className="stack-form compact-form" onSubmit={handleEvaluationSubmit}>
+          <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
+          <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
+          <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
+          <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
+          <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
+          <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
+          <label className="detail-card-wide">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
+          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Evaluation'}</motion.button>
+        </form>
       </motion.article>
       <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
         <div className="panel-header"><div><p className="panel-kicker">Attendance Heatmap & Certificates</p><h2>Monitor consistency and readiness</h2></div><CheckCircle2 size={20} /></div>

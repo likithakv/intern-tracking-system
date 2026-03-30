@@ -226,13 +226,13 @@ def _task_email_body(intern_name, task, context_line):
     """
 
 
-def _attendance_email_body(intern_name, attendance_date):
+def _attendance_email_body(intern_name, attendance_date, attendance_status):
     return f"""
     <html>
       <body style="font-family: Arial, sans-serif; color: #0f172a;">
-        <h2 style="margin-bottom: 12px;">Attendance Alert</h2>
+        <h2 style="margin-bottom: 12px;">Attendance Update</h2>
         <p>Hi {intern_name},</p>
-        <p>Your attendance has been marked as <strong>Absent</strong> for <strong>{attendance_date}</strong>.</p>
+        <p>Your attendance has been marked as <strong>{attendance_status}</strong> for <strong>{attendance_date}</strong>.</p>
         <p>If this needs correction, please contact your mentor or admin as soon as possible.</p>
       </body>
     </html>
@@ -250,11 +250,11 @@ async def notify_task_assignment(intern, task):
     )
 
 
-async def notify_absent_attendance(intern, attendance_date):
+async def notify_attendance_marked(intern, attendance_date, attendance_status):
     await send_email(
         intern["email"],
-        f"Attendance marked absent for {attendance_date}",
-        _attendance_email_body(intern["name"], attendance_date),
+        f"Attendance marked {attendance_status.lower()} for {attendance_date}",
+        _attendance_email_body(intern["name"], attendance_date, attendance_status),
         intern_id=str(intern["_id"]),
     )
 
