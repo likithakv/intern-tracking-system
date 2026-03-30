@@ -325,6 +325,7 @@ function App() {
   const [showInternProfileModal, setShowInternProfileModal] = useState(false);
   const [showInternTaskUpdateModal, setShowInternTaskUpdateModal] = useState(false);
   const [showInternDetailModal, setShowInternDetailModal] = useState(false);
+  const [showEvaluationModal, setShowEvaluationModal] = useState(false);
   const [editingIntern, setEditingIntern] = useState(null);
   const [selectedInternForMessage, setSelectedInternForMessage] = useState(null);
   const [selectedInternDetail, setSelectedInternDetail] = useState(null);
@@ -1138,6 +1139,7 @@ function App() {
         ownership: Number(evaluationForm.ownership),
       });
       setSuccessMessage('Evaluation saved successfully.');
+      setShowEvaluationModal(false);
       await loadDashboard();
     } catch (err) {
       setError(err.message || 'Unable to save evaluation.');
@@ -1552,27 +1554,20 @@ function App() {
           </div>
         </motion.article>
       </section>
-      <section className="dashboard-grid single-column">
-        <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-          <div className="panel-header"><div><p className="panel-kicker">Performance Review</p><h2>Submit an intern evaluation</h2></div><Star size={20} /></div>
-          {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
-          <form className="review-form" onSubmit={handleEvaluationSubmit}>
-            <div className="review-form-top">
-              <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
-              <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
+        <section className="dashboard-grid single-column">
+          <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="panel-header"><div><p className="panel-kicker">Performance Review</p><h2>Open the dedicated review center</h2></div><Star size={20} /></div>
+            {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
+            <div className="review-launch-card">
+              <div className="review-launch-copy">
+                <strong>Review Center</strong>
+                <p>Attendance tracking stays in its own block. Intern performance reviews are now submitted from a separate form window for cleaner admin workflow.</p>
+              </div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="button" onClick={() => setShowEvaluationModal(true)}>Open Review Form</motion.button>
             </div>
-            <div className="review-score-grid">
-              <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
-              <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
-              <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
-              <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
-            </div>
-            <label className="review-comments">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Review'}</motion.button>
-          </form>
-        </motion.article>
-      </section>
-      <section className="dashboard-grid">
+          </motion.article>
+        </section>
+        <section className="dashboard-grid">
         <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
           <div className="panel-header"><div><p className="panel-kicker">Attendance Heatmap & Certificates</p><h2>Monitor consistency and readiness</h2></div><CheckCircle2 size={20} /></div>
           <div className="heatmap-wrap">
@@ -2499,6 +2494,33 @@ function App() {
               ) : null}
               <div className="helper-note">Recipient count: {broadcastForm.recipient_mode === 'all' ? dashboard.interns.length : broadcastForm.selected_intern_ids.length}</div>
               <button className="primary-button submit-button" type="submit" disabled={isSendingBroadcast}>{isSendingBroadcast ? 'Sending...' : 'Send Announcement'}</button>
+            </form>
+          </div>
+        </div>
+      ) : null}
+      {showEvaluationModal ? (
+        <div className="modal-backdrop" onClick={() => setShowEvaluationModal(false)}>
+          <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+            <div className="panel-header">
+              <div>
+                <p className="panel-kicker">Performance Review</p>
+                <h2>Submit an intern evaluation</h2>
+              </div>
+              <button className="ghost-button" type="button" onClick={() => setShowEvaluationModal(false)}>Close</button>
+            </div>
+            <form className="review-form" onSubmit={handleEvaluationSubmit}>
+              <div className="review-form-top">
+                <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
+                <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
+              </div>
+              <div className="review-score-grid">
+                <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
+                <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
+                <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
+                <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
+              </div>
+              <label className="review-comments">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Review'}</motion.button>
             </form>
           </div>
         </div>
