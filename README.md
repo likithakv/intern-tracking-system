@@ -2,6 +2,12 @@
 
 A full-stack internship management platform for tracking interns, tasks, attendance, performance, notifications, badges, and certificate readiness.
 
+## Live Links
+
+- Frontend: `https://intern-tracking-system-4kocsfxv8-likithakvs-projects.vercel.app`
+- Backend: `https://intern-tracking-api-system.onrender.com`
+- Backend Health: `https://intern-tracking-api-system.onrender.com/api/health`
+
 ## Overview
 
 This project now includes both an admin experience and an intern experience:
@@ -163,6 +169,42 @@ Then open:
 - chandan
   - Email: `chandanchandukv2005@gmail.com`
   - Password: `chandan123`
+
+## Hosted Deployment
+
+- Frontend hosted on `Vercel`
+- Backend hosted on `Render`
+- Database hosted on `MongoDB Atlas`
+
+Deployment environment variables used for hosting:
+
+### Backend
+
+```env
+MONGO_URI=your-mongodb-atlas-uri-with-database-name
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USERNAME=your-sender-email
+SMTP_PASSWORD=your-app-password
+SMTP_FROM_EMAIL=your-sender-email
+```
+
+### Frontend
+
+```env
+VITE_API_BASE_URL=https://intern-tracking-api-system.onrender.com/api
+```
+
+## Demo Checklist
+
+Use this order during a live demo:
+
+1. Open the live frontend
+2. Log in as admin
+3. Show intern management, task assignment, attendance, evaluations, and certificates
+4. Show intern login and profile, tasks, attendance, inbox, leave request, and certificate area
+5. Show automatic badges and profile completion
+6. Show email or announcement flow
 
 ## SMTP Setup
 
