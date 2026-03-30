@@ -1561,7 +1561,6 @@ function App() {
             <div className="review-launch-card">
               <div className="review-launch-copy">
                 <strong>Review Center</strong>
-                <p>Attendance tracking stays in its own block. Intern performance reviews are now submitted from a separate form window for cleaner admin workflow.</p>
               </div>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="button" onClick={() => setShowEvaluationModal(true)}>Open Review Form</motion.button>
             </div>
