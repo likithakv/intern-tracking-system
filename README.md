@@ -4,7 +4,7 @@ A full-stack internship management platform for tracking interns, tasks, attenda
 
 ## Live Links
 
-- Frontend: `https://intern-tracking-system-4kocsfxv8-likithakvs-projects.vercel.app`
+- Frontend: `https://intern-tracking-system-seven.vercel.app`
 - Backend: `https://intern-tracking-api-system.onrender.com`
 - Backend Health: `https://intern-tracking-api-system.onrender.com/api/health`
 
