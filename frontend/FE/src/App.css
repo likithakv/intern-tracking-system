@@ -952,6 +952,48 @@ td span {
   margin-bottom: 20px;
 }
 
+.review-form {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid #d8e2ec;
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(239, 246, 255, 0.94));
+}
+
+.review-form-top,
+.review-score-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.review-form label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.review-form input,
+.review-form select,
+.review-form textarea {
+  border: 1px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 12px 14px;
+  font: inherit;
+  background: #fff;
+}
+
+.review-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.review-comments {
+  grid-column: 1 / -1;
+}
+
 .settings-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }

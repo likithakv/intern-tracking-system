@@ -170,6 +170,16 @@ async def review_leave_request(request_id: str, payload: LeaveRequestReview):
                 "absent_email_sent_on": None,
             }
         )
+    intern = await db.interns.find_one({"_id": ObjectId(existing["intern_id"])})
+    if intern:
+        await db.activity.insert_one(
+            {
+                "kind": "attendance",
+                "intern_id": existing["intern_id"],
+                "message": f"Your leave request from {existing['start_date']} to {existing['end_date']} was {payload.status.lower()} by admin.",
+                "created_at": datetime.utcnow(),
+            }
+        )
     await db.audit_logs.insert_one(
         {
             "entity": "leave_request",

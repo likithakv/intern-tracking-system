@@ -336,6 +336,7 @@ function App() {
   const [statusFilter, setStatusFilter] = useState('All Statuses');
   const [batchFilter, setBatchFilter] = useState('All Batches');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showInternNotifications, setShowInternNotifications] = useState(false);
   const [showAdminProfile, setShowAdminProfile] = useState(false);
   const [isEditingAdminProfile, setIsEditingAdminProfile] = useState(false);
   const [internForm, setInternForm] = useState(emptyInternForm);
@@ -439,6 +440,10 @@ function App() {
     if (!dashboard) return 0;
     return dashboard.alerts.lowAttendance.length + dashboard.alerts.pendingTasks.length + (dashboard.notificationSummary?.queuedEmails || 0);
   }, [dashboard]);
+  const internNotificationItems = useMemo(() => {
+    if (!internDashboard?.recentActivity) return [];
+    return internDashboard.recentActivity.filter((item) => ['task', 'attendance', 'announcement', 'email', 'evaluation'].includes(item.kind));
+  }, [internDashboard]);
   const internVisibleTasks = useMemo(() => {
     if (!internDashboard?.tasks) return [];
     if (internTaskFilter === 'completed') return internDashboard.tasks.filter((task) => task.status === 'Completed');
@@ -668,6 +673,7 @@ function App() {
     setTasks([]);
     setSearchQuery('');
     setShowNotifications(false);
+    setShowInternNotifications(false);
     setShowAdminProfile(false);
     setShowInternProfileModal(false);
     setShowInternTaskUpdateModal(false);
@@ -1511,93 +1517,103 @@ function App() {
   );
 
   const renderAttendance = () => (
-    <section className="dashboard-grid">
-      <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="panel-header"><div><p className="panel-kicker">Attendance Tracking</p><h2>Mark intern attendance</h2></div><CalendarRange size={20} /></div>
-        <form className="stack-form compact-form" onSubmit={handleAttendanceSubmit}>
-          <label>Intern<select value={attendanceForm.intern_id} onChange={(event) => setAttendanceForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
-          <label>Date<input type="date" value={attendanceForm.date} onChange={(event) => setAttendanceForm((current) => ({ ...current, date: event.target.value }))} required /></label>
-          <label>Status<select value={attendanceForm.status} onChange={(event) => setAttendanceForm((current) => ({ ...current, status: event.target.value }))}><option>Present</option><option>Absent</option><option>Leave</option></select></label>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Mark Attendance'}</motion.button>
-        </form>
-        <div className="helper-note">Whenever admin marks attendance, the selected intern now receives an immediate attendance status email update.</div>
-        <div className="evaluation-grid">
-          {filteredPerformance.map((item) => (
-            <motion.div key={item.internId} className="evaluation-card" whileHover={{ y: -5 }}>
-              <div className="evaluation-head">
-                <strong>{item.name}</strong>
-                <span className={`performance-band ${item.band.toLowerCase()}`}>{item.band}</span>
-              </div>
-              <div className="metric-chip-row">
-                <span>Score: {item.score}</span>
-                <span>Attendance: {item.attendanceRate}%</span>
-                <span>Tasks: {item.taskCompletionRate}%</span>
-              </div>
-              {dashboard.evaluations.find((entry) => entry.intern_id === item.internId) ? (
-                <div className="helper-note compact-note">
-                  <span>Evaluation: {dashboard.evaluations.find((entry) => entry.intern_id === item.internId).overall_score}/100</span>
-                  <span>{dashboard.evaluations.find((entry) => entry.intern_id === item.internId).comments}</span>
+    <>
+      <section className="dashboard-grid single-column">
+        <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="panel-header"><div><p className="panel-kicker">Attendance Tracking</p><h2>Mark intern attendance</h2></div><CalendarRange size={20} /></div>
+          <form className="stack-form compact-form" onSubmit={handleAttendanceSubmit}>
+            <label>Intern<select value={attendanceForm.intern_id} onChange={(event) => setAttendanceForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
+            <label>Date<input type="date" value={attendanceForm.date} onChange={(event) => setAttendanceForm((current) => ({ ...current, date: event.target.value }))} required /></label>
+            <label>Status<select value={attendanceForm.status} onChange={(event) => setAttendanceForm((current) => ({ ...current, status: event.target.value }))}><option>Present</option><option>Absent</option><option>Leave</option></select></label>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Mark Attendance'}</motion.button>
+          </form>
+          <div className="helper-note">Whenever admin marks attendance, the selected intern now receives an immediate attendance status email update.</div>
+          <div className="evaluation-grid">
+            {filteredPerformance.map((item) => (
+              <motion.div key={item.internId} className="evaluation-card" whileHover={{ y: -5 }}>
+                <div className="evaluation-head">
+                  <strong>{item.name}</strong>
+                  <span className={`performance-band ${item.band.toLowerCase()}`}>{item.band}</span>
                 </div>
-              ) : null}
-              <div className="mini-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${item.score}%` }} transition={{ duration: 0.8 }} /></div>
-            </motion.div>
-          ))}
-        </div>
-      </motion.article>
-      <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="panel-header"><div><p className="panel-kicker">Evaluation Form</p><h2>Review intern performance separately</h2></div><Star size={20} /></div>
-        {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
-        <form className="stack-form compact-form" onSubmit={handleEvaluationSubmit}>
-          <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
-          <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
-          <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
-          <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
-          <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
-          <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
-          <label className="detail-card-wide">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
-          <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Evaluation'}</motion.button>
-        </form>
-      </motion.article>
-      <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="panel-header"><div><p className="panel-kicker">Attendance Heatmap & Certificates</p><h2>Monitor consistency and readiness</h2></div><CheckCircle2 size={20} /></div>
-        <div className="heatmap-wrap">
-          <div className="heatmap-dates" style={heatmapGridStyle}><span>Intern</span>{dashboard.attendanceHeatmap.dates.map((item) => <span key={item}>{new Date(item).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>)}</div>
-          {dashboard.attendanceHeatmap.rows.map((row) => (
-            <div key={row.internName} className="heatmap-row" style={heatmapGridStyle}>
-              <span className="heatmap-name">{row.internName}</span>
-              {row.values.map((cell) => <span key={`${row.internName}-${cell.date}`} className={`heatmap-cell ${cell.status.toLowerCase()}`} title={`${row.internName} - ${cell.status} on ${formatDate(cell.date)}`} />)}
+                <div className="metric-chip-row">
+                  <span>Score: {item.score}</span>
+                  <span>Attendance: {item.attendanceRate}%</span>
+                  <span>Tasks: {item.taskCompletionRate}%</span>
+                </div>
+                {dashboard.evaluations.find((entry) => entry.intern_id === item.internId) ? (
+                  <div className="helper-note compact-note">
+                    <span>Evaluation: {dashboard.evaluations.find((entry) => entry.intern_id === item.internId).overall_score}/100</span>
+                    <span>{dashboard.evaluations.find((entry) => entry.intern_id === item.internId).comments}</span>
+                  </div>
+                ) : null}
+                <div className="mini-progress"><motion.span initial={{ width: 0 }} animate={{ width: `${item.score}%` }} transition={{ duration: 0.8 }} /></div>
+              </motion.div>
+            ))}
+          </div>
+        </motion.article>
+      </section>
+      <section className="dashboard-grid single-column">
+        <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="panel-header"><div><p className="panel-kicker">Performance Review</p><h2>Submit an intern evaluation</h2></div><Star size={20} /></div>
+          {sectionFocus === 'upcoming-evaluations' ? <div className="helper-note">This view highlights interns who need evaluation attention soon.</div> : null}
+          <form className="review-form" onSubmit={handleEvaluationSubmit}>
+            <div className="review-form-top">
+              <label>Intern<select value={evaluationForm.intern_id} onChange={(event) => setEvaluationForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
+              <label>Date<input type="date" value={evaluationForm.evaluation_date} onChange={(event) => setEvaluationForm((current) => ({ ...current, evaluation_date: event.target.value }))} required /></label>
             </div>
-          ))}
-        </div>
-        <div className="certificate-list">
-          {dashboard.certifications.map((item) => (
-            <div key={item.internId} className="certificate-card">
-              <div>
-                <strong>{item.name}</strong>
-                <span>{item.completedTasks}/{item.totalTasks} tasks, {item.attendanceRate}% attendance</span>
+            <div className="review-score-grid">
+              <label>Communication<input type="number" min="1" max="10" value={evaluationForm.communication} onChange={(event) => setEvaluationForm((current) => ({ ...current, communication: event.target.value }))} /></label>
+              <label>Technical Skill<input type="number" min="1" max="10" value={evaluationForm.technical_skill} onChange={(event) => setEvaluationForm((current) => ({ ...current, technical_skill: event.target.value }))} /></label>
+              <label>Teamwork<input type="number" min="1" max="10" value={evaluationForm.teamwork} onChange={(event) => setEvaluationForm((current) => ({ ...current, teamwork: event.target.value }))} /></label>
+              <label>Ownership<input type="number" min="1" max="10" value={evaluationForm.ownership} onChange={(event) => setEvaluationForm((current) => ({ ...current, ownership: event.target.value }))} /></label>
+            </div>
+            <label className="review-comments">Comments<textarea value={evaluationForm.comments} onChange={(event) => setEvaluationForm((current) => ({ ...current, comments: event.target.value }))} required /></label>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="secondary-button auth-submit" type="submit" disabled={isSubmittingEvaluation}>{isSubmittingEvaluation ? 'Saving...' : 'Save Review'}</motion.button>
+          </form>
+        </motion.article>
+      </section>
+      <section className="dashboard-grid">
+        <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
+          <div className="panel-header"><div><p className="panel-kicker">Attendance Heatmap & Certificates</p><h2>Monitor consistency and readiness</h2></div><CheckCircle2 size={20} /></div>
+          <div className="heatmap-wrap">
+            <div className="heatmap-dates" style={heatmapGridStyle}><span>Intern</span>{dashboard.attendanceHeatmap.dates.map((item) => <span key={item}>{new Date(item).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}</span>)}</div>
+            {dashboard.attendanceHeatmap.rows.map((row) => (
+              <div key={row.internName} className="heatmap-row" style={heatmapGridStyle}>
+                <span className="heatmap-name">{row.internName}</span>
+                {row.values.map((cell) => <span key={`${row.internName}-${cell.date}`} className={`heatmap-cell ${cell.status.toLowerCase()}`} title={`${row.internName} - ${cell.status} on ${formatDate(cell.date)}`} />)}
               </div>
-              <div className="certificate-actions">
-                <span className={`certificate-status ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>{item.status}</span>
-                <button className="secondary-button" type="button" disabled={!item.canDownload || downloadingCertificateId === item.internId} onClick={() => handleCertificateDownload(item)}>
-                  {downloadingCertificateId === item.internId ? 'Generating...' : item.canDownload ? 'Download Certificate' : 'Not Ready'}
-                </button>
+            ))}
+          </div>
+          <div className="certificate-list">
+            {dashboard.certifications.map((item) => (
+              <div key={item.internId} className="certificate-card">
+                <div>
+                  <strong>{item.name}</strong>
+                  <span>{item.completedTasks}/{item.totalTasks} tasks, {item.attendanceRate}% attendance</span>
+                </div>
+                <div className="certificate-actions">
+                  <span className={`certificate-status ${item.status.toLowerCase().replace(/\s+/g, '-')}`}>{item.status}</span>
+                  <button className="secondary-button" type="button" disabled={!item.canDownload || downloadingCertificateId === item.internId} onClick={() => handleCertificateDownload(item)}>
+                    {downloadingCertificateId === item.internId ? 'Generating...' : item.canDownload ? 'Download Certificate' : 'Not Ready'}
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-        <div className="mail-audit-card top-gap">
-          <h3>Leave Requests</h3>
-          {dashboard.leaveRequests?.length ? dashboard.leaveRequests.map((request) => (
-            <div key={request.id} className="mail-audit-item">
-              <strong>{request.internName}</strong>
-              <span>{formatDate(request.start_date)} to {formatDate(request.end_date)} | {request.reason}</span>
-              <span>Status: {request.status}</span>
-              {request.status === 'Pending' ? <div className="table-action-row"><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Approved')}>Approve</button><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Rejected')}>Reject</button></div> : null}
-            </div>
-          )) : <p className="muted-copy">No leave requests yet.</p>}
-        </div>
-      </motion.article>
-    </section>
+            ))}
+          </div>
+          <div className="mail-audit-card top-gap">
+            <h3>Leave Requests</h3>
+            {dashboard.leaveRequests?.length ? dashboard.leaveRequests.map((request) => (
+              <div key={request.id} className="mail-audit-item">
+                <strong>{request.internName}</strong>
+                <span>{formatDate(request.start_date)} to {formatDate(request.end_date)} | {request.reason}</span>
+                <span>Status: {request.status}</span>
+                {request.status === 'Pending' ? <div className="table-action-row"><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Approved')}>Approve</button><button className="table-action" type="button" onClick={() => handleLeaveRequestReview(request.id, 'Rejected')}>Reject</button></div> : null}
+              </div>
+            )) : <p className="muted-copy">No leave requests yet.</p>}
+          </div>
+        </motion.article>
+      </section>
+    </>
   );
 
   const renderCertificates = () => (
@@ -1715,6 +1731,10 @@ function App() {
             </div>
           </div>
         </button>
+        <button type="button" className="sidebar-utility-button sidebar-utility-profile" onClick={() => setShowInternNotifications((current) => !current)}>
+          <span className="sidebar-utility-left"><Bell size={16} />Notifications</span>
+          {internNotificationItems.length ? <span className="sidebar-utility-badge">{internNotificationItems.length}</span> : null}
+        </button>
         <nav className="sidebar-nav">
           {internSections.map((section) => {
             const Icon = section.icon;
@@ -1735,6 +1755,10 @@ function App() {
           </div>
           <div className="hero-actions hero-topbar">
             <div className="profile-chip">
+              <Bell size={16} />
+              <span>{internNotificationItems.length} notifications</span>
+            </div>
+            <div className="profile-chip">
               <ShieldCheck size={16} />
               <span>{internDashboard.performance.band}</span>
             </div>
@@ -1744,6 +1768,29 @@ function App() {
             </div>
           </div>
         </motion.div>
+        <AnimatePresence>
+          {showInternNotifications ? (
+            <motion.div className="notification-drawer" initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}>
+              <div className="notification-header">
+                <strong>My Notifications</strong>
+                <button type="button" className="ghost-button" onClick={() => setShowInternNotifications(false)}>Close</button>
+              </div>
+              <div className="activity-list">
+                {internNotificationItems.length ? internNotificationItems.map((item) => (
+                  <button key={item.id} type="button" className="activity-item notification-item-button" onClick={() => {
+                    if (item.kind === 'task') setInternSection('tasks');
+                    else if (item.kind === 'attendance') setInternSection('attendance');
+                    else setInternSection('overview');
+                    setShowInternNotifications(false);
+                  }}>
+                    <div className={`activity-dot activity-${item.kind}`} />
+                    <div><p>{item.message}</p><span>{relativeTime(item.timestamp)}</span></div>
+                  </button>
+                )) : <p className="muted-copy">No notifications yet.</p>}
+              </div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
         {internSection === 'overview' ? (
           <>
             <section className="stats-grid">
