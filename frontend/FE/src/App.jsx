@@ -40,6 +40,7 @@ import {
   loginAdmin,
   loginIntern,
   markAttendance,
+  registerIntern,
   reviewLeaveRequest,
   registerAdmin,
   sendBroadcastMessage,
@@ -287,23 +288,23 @@ function AuthScreen({
             <button type="button" className={accessMode === 'admin' ? 'auth-tab active' : 'auth-tab'} onClick={() => setAccessMode('admin')}>Admin</button>
             <button type="button" className={accessMode === 'intern' ? 'auth-tab active' : 'auth-tab'} onClick={() => setAccessMode('intern')}>Intern</button>
           </div>
-          {accessMode === 'admin' ? <div className="auth-toggle">
+          <div className="auth-toggle">
             <button type="button" className={authMode === 'login' ? 'auth-tab active' : 'auth-tab'} onClick={() => setAuthMode('login')}>Login</button>
             <button type="button" className={authMode === 'register' ? 'auth-tab active' : 'auth-tab'} onClick={() => setAuthMode('register')}>Register</button>
-          </div> : null}
+          </div>
           {error ? <div className="inline-error">{error}</div> : null}
-          {accessMode === 'intern' || authMode === 'login' ? (
+          {authMode === 'login' ? (
             <form className="auth-form" onSubmit={onLogin}>
               <label>{accessMode === 'admin' ? 'Admin email' : 'Intern email'}<input name="email" type="email" value={loginForm.email} onChange={onLoginChange} required /></label>
               <label>Password<input name="password" type="password" value={loginForm.password} onChange={onLoginChange} required /></label>
-              <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Signing in...' : accessMode === 'admin' ? 'Login' : 'Enter Portal'}</button>
+              <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Signing in...' : 'Login'}</button>
             </form>
           ) : (
             <form className="auth-form" onSubmit={onRegister}>
-              <label>Admin name<input name="name" value={registerForm.name} onChange={onRegisterChange} required /></label>
-              <label>Admin email<input name="email" type="email" value={registerForm.email} onChange={onRegisterChange} required /></label>
+              <label>{accessMode === 'admin' ? 'Admin name' : 'Intern name'}<input name="name" value={registerForm.name} onChange={onRegisterChange} required /></label>
+              <label>{accessMode === 'admin' ? 'Admin email' : 'Intern email'}<input name="email" type="email" value={registerForm.email} onChange={onRegisterChange} required /></label>
               <label>Password<input name="password" type="password" value={registerForm.password} onChange={onRegisterChange} required /></label>
-              <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Creating...' : 'Create Admin'}</button>
+              <button className="primary-button auth-submit" type="submit" disabled={authLoading}>{authLoading ? 'Creating...' : accessMode === 'admin' ? 'Create Admin' : 'Create Intern Account'}</button>
             </form>
           )}
         </div>
@@ -665,11 +666,16 @@ function App() {
     try {
       setAuthLoading(true);
       setError('');
-      const response = await registerAdmin(registerForm);
-      handleAuthSuccess(response.admin);
+      if (accessMode === 'intern') {
+        const response = await registerIntern(registerForm);
+        handleAuthSuccess(response.intern);
+      } else {
+        const response = await registerAdmin(registerForm);
+        handleAuthSuccess(response.admin);
+      }
       setRegisterForm(emptyRegisterForm);
     } catch (err) {
-      setError(err.message || 'Unable to register admin.');
+      setError(err.message || `Unable to register ${accessMode}.`);
     } finally {
       setAuthLoading(false);
     }

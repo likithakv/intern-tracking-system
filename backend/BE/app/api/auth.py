@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date, datetime, timedelta
 
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException, status
@@ -10,6 +10,12 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 class AdminRegister(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    email: EmailStr
+    password: str = Field(min_length=6, max_length=128)
+
+
+class InternRegister(BaseModel):
     name: str = Field(min_length=2, max_length=80)
     email: EmailStr
     password: str = Field(min_length=6, max_length=128)
@@ -110,6 +116,39 @@ async def register_admin(payload: AdminRegister):
     result = await db.admins.insert_one(admin_doc)
     created = await db.admins.find_one({"_id": result.inserted_id})
     return {"message": "Admin registered successfully.", "admin": serialize_admin(created)}
+
+
+@router.post("/intern-register", status_code=status.HTTP_201_CREATED)
+async def register_intern(payload: InternRegister):
+    existing = await db.interns.find_one({"email": payload.email.lower()})
+    if existing:
+        raise HTTPException(status_code=400, detail="Intern email already registered.")
+
+    today = date.today()
+    intern_doc = {
+        "name": payload.name.strip(),
+        "email": payload.email.lower(),
+        "phone": "",
+        "college": "",
+        "domain": "General Internship",
+        "skills": [],
+        "mentor": "To Be Assigned",
+        "status": "On Track",
+        "batch": "Current Cycle",
+        "emergency_contact": "",
+        "documents": [],
+        "document_records": {},
+        "notes": "Self-registered intern profile. Admin can complete onboarding details.",
+        "portal_password_hash": hash_password(payload.password),
+        "archived": False,
+        "start_date": today.isoformat(),
+        "end_date": (today + timedelta(days=60)).isoformat(),
+        "last_active": today.isoformat(),
+        "created_at": datetime.utcnow(),
+    }
+    result = await db.interns.insert_one(intern_doc)
+    created = await db.interns.find_one({"_id": result.inserted_id})
+    return {"message": "Intern registered successfully.", "intern": serialize_intern_session(created)}
 
 
 @router.post("/login")

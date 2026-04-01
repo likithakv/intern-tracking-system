@@ -153,6 +153,15 @@ export async function registerAdmin(payload) {
   }
 }
 
+export async function registerIntern(payload) {
+  try {
+    const response = await axiosInstance.post('/auth/intern-register', payload);
+    return response.data;
+  } catch (error) {
+    throw new Error(normalizeError(error));
+  }
+}
+
 export async function loginAdmin(payload) {
   try {
     const response = await axiosInstance.post('/auth/login', payload);
