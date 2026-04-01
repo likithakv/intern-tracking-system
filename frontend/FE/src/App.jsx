@@ -84,7 +84,7 @@ const emptyTaskForm = {
   title: '', description: '', assigned_to: '', priority: 'Medium', start_date: '',
   deadline: '', status: 'Pending', progress: 0, deliverable: '', project_template: '',
 };
-const emptyAttendanceForm = { intern_id: '', date: '', status: 'Present' };
+const emptyAttendanceForm = { date: '', records: {} };
 const emptyEvaluationForm = { intern_id: '', communication: 8, technical_skill: 8, teamwork: 8, ownership: 8, comments: '', evaluation_date: '' };
 const emptyLoginForm = { email: '', password: '' };
 const emptyRegisterForm = { name: '', email: '', password: '' };
@@ -384,6 +384,7 @@ function App() {
   const [isSubmittingEvaluation, setIsSubmittingEvaluation] = useState(false);
   const [isSubmittingLeaveRequest, setIsSubmittingLeaveRequest] = useState(false);
   const normalizedQuery = searchQuery.trim().toLowerCase();
+  const hasOpenModal = showInternModal || showMessageModal || showBroadcastModal || showInternProfileModal || showInternTaskUpdateModal || showInternDetailModal || showEvaluationModal;
 
   const maxTaskValue = useMemo(() => {
     if (!dashboard?.taskCompletion?.length) return 1;
@@ -492,8 +493,11 @@ function App() {
     }));
     setAttendanceForm((current) => ({
       ...current,
-      intern_id: current.intern_id || dashboard.interns[0].id,
       date: current.date || new Date().toISOString().slice(0, 10),
+      records: dashboard.interns.reduce((accumulator, intern) => {
+        accumulator[intern.id] = current.records?.[intern.id] || 'Present';
+        return accumulator;
+      }, {}),
     }));
     setEvaluationForm((current) => ({
       ...current,
@@ -501,6 +505,11 @@ function App() {
       evaluation_date: current.evaluation_date || new Date().toISOString().slice(0, 10),
     }));
   }, [dashboard]);
+
+  useEffect(() => {
+    document.body.classList.toggle('modal-open', hasOpenModal);
+    return () => document.body.classList.remove('modal-open');
+  }, [hasOpenModal]);
 
   useEffect(() => {
     if (!adminSession) return;
@@ -1116,8 +1125,16 @@ function App() {
     try {
       setIsAttendanceSubmitting(true);
       setError('');
-      await markAttendance(attendanceForm);
-      setSuccessMessage('Attendance updated successfully.');
+      await Promise.all(
+        Object.entries(attendanceForm.records || {}).map(([intern_id, status]) => (
+          markAttendance({
+            intern_id,
+            date: attendanceForm.date,
+            status,
+          })
+        )),
+      );
+      setSuccessMessage('Attendance updated for all listed interns successfully.');
       await loadDashboard();
     } catch (err) {
       setError(err.message || 'Unable to mark attendance.');
@@ -1524,10 +1541,33 @@ function App() {
         <motion.article className="panel" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}>
           <div className="panel-header"><div><p className="panel-kicker">Attendance Tracking</p><h2>Mark intern attendance</h2></div><CalendarRange size={20} /></div>
           <form className="stack-form compact-form" onSubmit={handleAttendanceSubmit}>
-            <label>Intern<select value={attendanceForm.intern_id} onChange={(event) => setAttendanceForm((current) => ({ ...current, intern_id: event.target.value }))} required>{dashboard.interns.map((intern) => <option key={intern.id} value={intern.id}>{intern.name}</option>)}</select></label>
             <label>Date<input type="date" value={attendanceForm.date} onChange={(event) => setAttendanceForm((current) => ({ ...current, date: event.target.value }))} required /></label>
-            <label>Status<select value={attendanceForm.status} onChange={(event) => setAttendanceForm((current) => ({ ...current, status: event.target.value }))}><option>Present</option><option>Absent</option><option>Leave</option></select></label>
-            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Mark Attendance'}</motion.button>
+            <div className="attendance-roster">
+              {dashboard.interns.map((intern) => (
+                <div key={intern.id} className="attendance-row-card">
+                  <div className="attendance-row-copy">
+                    <strong>{intern.name}</strong>
+                    <span>{intern.domain} • {intern.status}</span>
+                  </div>
+                  <div className="attendance-toggle-group">
+                    {['Present', 'Absent', 'Leave'].map((status) => (
+                      <button
+                        key={status}
+                        type="button"
+                        className={`attendance-toggle ${status.toLowerCase()} ${attendanceForm.records?.[intern.id] === status ? 'active' : ''}`}
+                        onClick={() => setAttendanceForm((current) => ({
+                          ...current,
+                          records: { ...current.records, [intern.id]: status },
+                        }))}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="primary-button auth-submit" type="submit" disabled={isAttendanceSubmitting}>{isAttendanceSubmitting ? 'Saving...' : 'Submit Attendance'}</motion.button>
           </form>
           <div className="helper-note">Whenever admin marks attendance, the selected intern now receives an immediate attendance status email update.</div>
           <div className="evaluation-grid">
@@ -2394,7 +2434,7 @@ function App() {
       </main>
       {showInternModal ? (
         <div className="modal-backdrop" onClick={() => setShowInternModal(false)}>
-          <div className="modal-card" onClick={(event) => event.stopPropagation()}>
+          <div className="modal-card modal-card-scrollable" onClick={(event) => event.stopPropagation()}>
             <div className="panel-header">
               <div><p className="panel-kicker">{editingIntern ? 'Edit Intern' : 'Add Intern'}</p><h2>{editingIntern ? 'Update intern information' : 'Create a new intern record'}</h2></div>
               <button className="ghost-button" onClick={() => setShowInternModal(false)}>Close</button>
